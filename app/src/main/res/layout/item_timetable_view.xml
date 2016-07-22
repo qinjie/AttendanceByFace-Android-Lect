@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:paddingLeft="5dip"
+    android:paddingRight="5dip">
+
+    <RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_height="100dip"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_marginBottom="3dip"
+        android:background="@drawable/timetable_border">
+
+        <TextView android:text="NP0101"
+            android:id="@+id/classid_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:layout_marginTop="5dip"
+            android:layout_above="@+id/subject_text"
+            android:textSize="18dp"
+            android:textColor="#030303">
+        </TextView>
+
+        <TextView android:text="Discrete Math"
+            android:id="@+id/subject_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/timeanddate_text"
+            android:textSize="18dp"
+            android:textColor="#030303">
+        </TextView>
+
+        <TextView android:text="1:00 - 2:00, 7/14/2016"
+            android:id="@+id/timeanddate_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="18dp"
+            android:layout_marginBottom="7dip"
+            android:layout_alignParentBottom="true"
+            android:textColor="#030303">
+        </TextView>
+
+        <RelativeLayout
+            android:orientation="vertical"
+            android:layout_width="100dip"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true">
+
+            <ImageView
+                android:layout_width="50dip"
+                android:layout_height="match_parent"
+                android:id="@+id/white_back"
+                android:src="@drawable/rectangle_white"
+                android:layout_alignParentRight="true"/>
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/percent_history_image"
+                android:src="@drawable/red_round_with_stroke"
+                android:layout_alignParentRight="true"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="10/12"
+                android:id="@+id/all_taken_text"
+                android:layout_centerInParent="true"
+                android:gravity="center"
+                android:textSize="27dp"/>
+
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+</LinearLayout>
