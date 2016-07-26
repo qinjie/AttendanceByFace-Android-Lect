@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/ATK-Teacher.iml" filepath="$PROJECT_DIR$/ATK-Teacher.iml" />
+      <module fileurl="file://$PROJECT_DIR$/AttendanceByFace-Android-Lect.iml" filepath="$PROJECT_DIR$/AttendanceByFace-Android-Lect.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

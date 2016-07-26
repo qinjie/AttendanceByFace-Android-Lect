@@ -1,5 +1,7 @@
 package sg.edu.np.atk_teacher;
 
+import android.app.Activity;
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -13,10 +15,18 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.Spinner;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import butterknife.ButterKnife;
@@ -33,6 +43,11 @@ public class TimeTableActivity extends AppCompatActivity
     ListView listView;
     private int preLast;
     private Date preDate = new Date();
+    private Spinner spinner;
+    private ImageButton date_picker;
+    private final String ALL_SUBJECT = "All Subjects";
+    private String curr_subject = ALL_SUBJECT;
+    private Activity activity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +55,10 @@ public class TimeTableActivity extends AppCompatActivity
         setContentView(R.layout.activity_timetable);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        activity = this;
+        date_picker = (ImageButton) findViewById(R.id.datePickerButt);
+        spinner = (Spinner) findViewById(R.id.spinner);
 
         ButterKnife.inject(this);
 
@@ -74,7 +93,7 @@ public class TimeTableActivity extends AppCompatActivity
 
                         final int lastItem = firstVisibleItem + visibleItemCount;
                         if(lastItem == totalItemCount) {
-                            if(preLast!=lastItem){
+                            if(preLast!=lastItem) {
                                 preLast = lastItem;
                                 //TODO:complete this using request to server
                                 List<Item_timetable> additional_list = getTimetableList();
@@ -107,7 +126,64 @@ public class TimeTableActivity extends AppCompatActivity
             }
         });
 
+
+        HashSet<String> unique_subjects = new HashSet<>();
+        for(Item_timetable item : timetable_list) {
+            unique_subjects.add(item.getSubject_name());
+        }
+        ArrayList<String> options = new ArrayList<String>();
+        options.add(ALL_SUBJECT);
+        for(String subject : unique_subjects)
+            options.add(subject);
+        final ArrayAdapter<String> options_adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, options);
+        options_adapter.setDropDownViewResource(R.layout.spinner_layout);
+        spinner.setAdapter(options_adapter);
+
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+
+                curr_subject = options_adapter.getItem(position);;
+
+                timetable_list.clear();
+                timetable_list.addAll(getTimetableList());
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+
+            }
+
+        });
+
+
+        date_picker.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Calendar c = Calendar.getInstance();
+                int year = c.get(Calendar.YEAR);
+                int month = c.get(Calendar.MONTH);
+                int day = c.get(Calendar.DAY_OF_MONTH);
+                new DatePickerDialog(activity, datePickerListener, year, month, day).show();
+            }
+        });
+
     }
+
+    private DatePickerDialog.OnDateSetListener datePickerListener = new DatePickerDialog.OnDateSetListener() {
+
+        // this method will call on close dialog box
+        public void onDateSet(DatePicker view, int selectedYear,
+                              int selectedMonth, int selectedDay) {
+
+            int year = selectedYear;
+            int month = selectedMonth;
+            int day = selectedDay;
+            //TODO: above is time chosen
+
+        }
+    };
 
     @Override
     public void onBackPressed() {
@@ -161,6 +237,7 @@ public class TimeTableActivity extends AppCompatActivity
 
     List getTimetableList() {
         List<Item_timetable> timetables = new ArrayList<Item_timetable>();
+        //TODO: get data from server, according to curr_subject and curr_date
         timetables.add(new Item_timetable("NP0101", "Discrete Math", "abc", 8, 0, 10, 0, "7/14/2016", 7, 15));
         timetables.add(new Item_timetable("NP0101", "Literature", "abc", 8, 0, 10, 0, "7/13/2016", 8, 15));
         timetables.add(new Item_timetable("NP0101", "Discrete Math", "abc", 8, 0, 10, 0, "7/14/2016", 9, 15));
@@ -173,6 +250,7 @@ public class TimeTableActivity extends AppCompatActivity
         timetables.add(new Item_timetable("NP0101", "Literature", "abc", 8, 0, 10, 0, "7/13/2016", 16, 20));
         timetables.add(new Item_timetable("NP0101", "Discrete Math", "abc", 8, 0, 10, 0, "7/14/2016", 1, 15));
         timetables.add(new Item_timetable("NP0101", "Literature", "abc", 8, 0, 10, 0, "7/13/2016", 2, 15));
+
         return timetables;
     }
 
