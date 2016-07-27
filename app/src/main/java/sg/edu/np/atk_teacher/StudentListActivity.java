@@ -24,8 +24,8 @@ import java.util.Date;
 import java.util.List;
 
 import sg.edu.np.atk_teacher.BaseClasses.GV;
-import sg.edu.np.atk_teacher.BaseClasses.Item_student;
-import sg.edu.np.atk_teacher.BaseClasses.Student_List_Array_Adapter;
+import sg.edu.np.atk_teacher.Items.Item_student;
+import sg.edu.np.atk_teacher.ArrayAdapters.Student_List_Array_Adapter;
 
 public class StudentListActivity extends ListActivity {
 

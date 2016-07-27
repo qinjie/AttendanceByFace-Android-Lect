@@ -16,7 +16,6 @@ import android.view.MenuItem;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -25,14 +24,14 @@ import android.widget.Spinner;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
 import butterknife.ButterKnife;
+import sg.edu.np.atk_teacher.BaseClasses.GF;
 import sg.edu.np.atk_teacher.BaseClasses.GV;
-import sg.edu.np.atk_teacher.BaseClasses.Item_timetable;
-import sg.edu.np.atk_teacher.BaseClasses.Timetable_Array_Adapter;
+import sg.edu.np.atk_teacher.Items.Item_timetable;
+import sg.edu.np.atk_teacher.ArrayAdapters.Timetable_Array_Adapter;
 
 public class TimeTableActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -47,6 +46,7 @@ public class TimeTableActivity extends AppCompatActivity
     private ImageButton date_picker;
     private final String ALL_SUBJECT = "All Subjects";
     private String curr_subject = ALL_SUBJECT;
+    private String auCode;
     private Activity activity;
 
     @Override
@@ -227,7 +227,7 @@ public class TimeTableActivity extends AppCompatActivity
             Intent intent = new Intent(this, ChangePasswordActivity.class);
             startActivityForResult(intent, REQUEST_CHANGEPASSWORD);
         } else if (id == R.id.nav_log_out) {
-            logoutAction();
+            GF.logoutAction(TimeTableActivity.this);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -254,11 +254,6 @@ public class TimeTableActivity extends AppCompatActivity
         return timetables;
     }
 
-    void logoutAction() {
-        GV.setAuCodeInSP(this, "");
-        Intent intent = new Intent(this, LoginActivity.class);
-        intent.putExtra("noBack", true);
-        startActivity(intent);
-    }
+
 
 }

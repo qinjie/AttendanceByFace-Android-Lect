@@ -1,4 +1,4 @@
-package sg.edu.np.atk_teacher.BaseClasses;
+package sg.edu.np.atk_teacher.Items;
 
 /**
  * Created by Lord One on 7/20/2016.

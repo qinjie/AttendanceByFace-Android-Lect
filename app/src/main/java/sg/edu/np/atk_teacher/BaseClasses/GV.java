@@ -13,6 +13,9 @@ public class GV {
                             notyet_code = 3;
     public static final String [] status_name = {"Present", "Late", "Absent"};
 
+    public static Activity activity;
+
+    public static String auCode = null;
 
     public static void setAuCodeInSP(Activity activity, String authorizationCode) {
         SharedPreferences pref = activity.getSharedPreferences("ATK_pref", 0);

@@ -1,4 +1,4 @@
-package sg.edu.np.atk_teacher.BaseClasses;
+package sg.edu.np.atk_teacher.ArrayAdapters;
 
 /**
  * Created by Lord One on 7/19/2016.
@@ -15,6 +15,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import sg.edu.np.atk_teacher.BaseClasses.GV;
+import sg.edu.np.atk_teacher.Items.Item_student;
 import sg.edu.np.atk_teacher.R;
 
 public class Student_List_Array_Adapter extends ArrayAdapter<Item_student>{

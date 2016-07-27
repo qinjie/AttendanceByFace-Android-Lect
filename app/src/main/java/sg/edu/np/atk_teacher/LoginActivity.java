@@ -19,6 +19,11 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import sg.edu.np.atk_teacher.BaseClasses.GF;
+import sg.edu.np.atk_teacher.BaseClasses.GV;
+import sg.edu.np.atk_teacher.BaseClasses.ServiceGenerator;
+import sg.edu.np.atk_teacher.BaseClasses.StringClient;
+import sg.edu.np.atk_teacher.UtilityClasses.LoginClass;
 
 /**
  * Created by Lord One on 7/21/2016.
@@ -42,6 +47,11 @@ public class LoginActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         ButterKnife.inject(this);
+
+        GV.activity = LoginActivity.this;
+
+        if(GF.alreadyLoggedIn(this))
+            onLoginSuccess();
 
         _loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -76,9 +86,9 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
-
     public void login() {
 
+        //TODO: validate before login
 //        if (!validate()) {
 //            onLoginFailed();
 //            return;
@@ -89,62 +99,63 @@ public class LoginActivity extends AppCompatActivity {
         String username = _usernameText.getText().toString();
         String password = _passwordText.getText().toString();
 
-//        StringClient client = ServiceGenerator.createService(StringClient.class);
+        username = "pppp";
+        password = "pppppp";
 
-//        LoginClass up = new LoginClass(username, password, this);
+        StringClient client = ServiceGenerator.createService(StringClient.class);
 
-//        Call<ResponseBody> call = client.login(up);
+        LoginClass up = new LoginClass(username, password);
 
-//        call.enqueue(new Callback<ResponseBody>() {
-//            @Override
-//            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-//                try {
-//                    int messageCode = response.code();
-//
-//                    if (messageCode == 200) {
-//                        JSONObject data = new JSONObject(response.body().string());
-//                        String authorizationCode = data.getString("token");
-//                        GlobalVariable.setAuCodeInSP(LogInActivity.this, authorizationCode);
-//                        Intent intent = new Intent(LogInActivity.this, TimeTableActivity.class);
-//                        startActivity(intent);
-//                    }
-//                    else if(messageCode == 400) {
-//                        JSONObject data = new JSONObject(response.errorBody().string());
-//                        int errorCode = data.getInt("code");
+        Call<ResponseBody> call = client.login(up);
+
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                try {
+                    int messageCode = response.code();
+
+                    if (messageCode == 200) {
+                        JSONObject data = new JSONObject(response.body().string());
+                        String authorizationCode = data.getString("token");
+                        GV.setAuCodeInSP(LoginActivity.this, authorizationCode);
+                        onLoginSuccess();
+                    }
+                    else if(messageCode == 400) {
+                        JSONObject data = new JSONObject(response.errorBody().string());
+                        int errorCode = data.getInt("code");
+                        onLoginFailed();
 //                        Notification.showLoginNoti(activity, errorCode);
-//                    }
-//                    else{
+                    }
+                    else {
 //                        ErrorClass.showError(LogInActivity.this, 1);
-//                    }
-//                } catch (Exception e) {
-//                    System.out.print("Exception caught Login");
+                    }
+                } catch (Exception e) {
+                    onLoginFailed();
+                    e.printStackTrace();
 //                    ErrorClass.showError(LogInActivity.this, 2);
-//                }
-//            }
+                }
+            }
 
-//            @Override
-//            public void onFailure(Call<ResponseBody> call, Throwable t) {
-//                System.out.print("Error Login");
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                System.out.print("Error Login");
+                onLoginFailed();
 //                ErrorClass.showError(LogInActivity.this, 3);
-//            }
-//        });
-        onLoginSuccess();
-        Intent intent = new Intent(this, TimeTableActivity.class);
-        startActivity(intent);
+            }
+        });
+
     }
 
     private void onLoginSuccess() {
         _loginButton.setEnabled(true);
+        Intent intent = new Intent(LoginActivity.this, TimeTableActivity.class);
+        startActivity(intent);
         finish();
     }
 
     private void onLoginFailed() {
         Toast.makeText(getBaseContext(), "Login failed", Toast.LENGTH_LONG).show();
-
         _loginButton.setEnabled(true);
-
-//        Intent intent = new Intent(this, TimeTableActivity.class);
-//        startActivity(intent);
     }
 
     public boolean validate() {
@@ -168,49 +179,6 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         return valid;
-    }
-
-    public void loginAction(String username, String password, final Activity activity) {
-//        StringClient client = ServiceGenerator.createService(StringClient.class);
-//
-//        LoginClass up = new LoginClass(username, password, this);
-//
-//        Call<ResponseBody> call = client.login(up);
-//
-//        call.enqueue(new Callback<ResponseBody>() {
-//            @Override
-//            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-//                try {
-//                    int messageCode = response.code();
-//
-//                    if (messageCode == 200) {
-//                        JSONObject data = new JSONObject(response.body().string());
-//                        String authorizationCode = data.getString("token");
-//                        GlobalVariable.setAuCodeInSP(LogInActivity.this, authorizationCode);
-//                        Intent intent = new Intent(LogInActivity.this, MainActivity.class);
-//                        startActivity(intent);
-//                    }
-//                    else if(messageCode == 400) {
-//                        JSONObject data = new JSONObject(response.errorBody().string());
-//                        int errorCode = data.getInt("code");
-//                        Notification.showLoginNoti(activity, errorCode);
-//                    }
-//                    else{
-//                        ErrorClass.showError(LogInActivity.this, 1);
-//                    }
-//                } catch (Exception e) {
-//                    System.out.print("Exception caught Login");
-//                    ErrorClass.showError(LogInActivity.this, 2);
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(Call<ResponseBody> call, Throwable t) {
-//                System.out.print("Error Login");
-//                ErrorClass.showError(LogInActivity.this, 3);
-//            }
-//        });
-
     }
 
 }

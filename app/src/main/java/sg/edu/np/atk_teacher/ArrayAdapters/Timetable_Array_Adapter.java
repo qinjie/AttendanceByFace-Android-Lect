@@ -1,4 +1,4 @@
-package sg.edu.np.atk_teacher.BaseClasses;
+package sg.edu.np.atk_teacher.ArrayAdapters;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import sg.edu.np.atk_teacher.Items.Item_timetable;
 import sg.edu.np.atk_teacher.R;
 
 /**
