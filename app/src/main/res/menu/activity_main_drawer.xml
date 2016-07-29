@@ -3,6 +3,10 @@
 
     <group android:checkableBehavior="single">
         <item
+            android:id="@+id/nav_timetable_this_week"
+            android:icon="@drawable/ic_menu_slideshow"
+            android:title="Timetable this week" />
+        <item
             android:id="@+id/nav_change_password"
             android:icon="@drawable/ic_menu_manage"
             android:title="Change Password" />

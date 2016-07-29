@@ -18,14 +18,24 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
+
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import sg.edu.np.atk_teacher.BaseClasses.GV;
+import sg.edu.np.atk_teacher.BaseClasses.ServiceGenerator;
+import sg.edu.np.atk_teacher.BaseClasses.StringClient;
 import sg.edu.np.atk_teacher.Items.Item_student;
 import sg.edu.np.atk_teacher.ArrayAdapters.Student_List_Array_Adapter;
+import sg.edu.np.atk_teacher.UtilityClasses.ModifyStatusClass;
 
 public class StudentListActivity extends ListActivity {
 
@@ -34,7 +44,10 @@ public class StudentListActivity extends ListActivity {
     String lesson_id;
     int start_hour;
     int start_minute;
+    String recorded_date;
     Date preDate = new Date();
+    int old_status;
+    List<Item_student> stu_list;
 
     Activity activity = this;
 
@@ -46,10 +59,11 @@ public class StudentListActivity extends ListActivity {
         lesson_id = getIntent().getStringExtra("lessonId");
         start_hour = getIntent().getIntExtra("startHour", 0);
         start_minute = getIntent().getIntExtra("startMinute", 0);
+        recorded_date = getIntent().getStringExtra("recordedDate");
 
         title = (TextView) findViewById(R.id.description_browser);
 
-        List<Item_student> stu_list = getStudentList();
+        stu_list = getStudentList();
 
         adapter = new Student_List_Array_Adapter(StudentListActivity.this, R.layout.student_view, stu_list);
         this.setListAdapter(adapter);
@@ -64,14 +78,14 @@ public class StudentListActivity extends ListActivity {
             preDate = currDate;
 
             Item_student student = adapter.getItem(position);
-            String student_name = student.getName();
-
-            showChangeStatusDialog(student_name);
+            old_status = student.getCurrent_status();
+            showChangeStatusDialog(student);
         }
 
     }
 
-    void showChangeStatusDialog(final String student_name) {
+    void showChangeStatusDialog(final Item_student student) {
+        final String student_name = student.getName();
         final Dialog dialog = new Dialog(StudentListActivity.this);
         dialog.setTitle("Change Status");
         dialog.setContentView(R.layout.change_status_dialog);
@@ -136,7 +150,14 @@ public class StudentListActivity extends ListActivity {
         change_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int selected_id = radio_group.getCheckedRadioButtonId();
+                final int selected_id = radio_group.getCheckedRadioButtonId();
+                final JSONObject status_list = new JSONObject();
+                try {
+                    status_list.put(String.valueOf(R.id.radioPresent), GV.attend_code);
+                    status_list.put(String.valueOf(R.id.radioLate), GV.late_code);
+                    status_list.put(String.valueOf(R.id.radioAbsent), GV.absent_code);
+                }
+                catch (Exception e) {}
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(activity);
 
@@ -159,12 +180,24 @@ public class StudentListActivity extends ListActivity {
                 builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-
+                        try {
+                            String recorded_time = "";
+                            if(selected_id == R.id.radioLate) {
+                                if(Build.VERSION.SDK_INT < 23)
+                                    recorded_time = String.format("%02d", timePicker.getCurrentHour()) + ":" + String.format("%02d", timePicker.getCurrentMinute());
+                                else
+                                    recorded_time = String.format("%02d", timePicker.getHour()) + ":" + String.format("%02d", timePicker.getMinute());
+                            }
+                            modifyStatusFunction(student.getId(), status_list.getInt(String.valueOf(selected_id)), recorded_time);
+                            dialog.dismiss();
+                        }
+                        catch (Exception e){}
                     }
                 });
                 builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
                     }
                 });
                 AlertDialog alertDialog = builder.create();
@@ -179,6 +212,54 @@ public class StudentListActivity extends ListActivity {
         });
 
         dialog.show();
+    }
+
+    void modifyStatusFunction (final String student_id, final int status, String recorded_time) {
+        ModifyStatusClass up = new ModifyStatusClass(student_id, lesson_id, recorded_date, status, recorded_time);
+
+        StringClient client = ServiceGenerator.createService(StringClient.class);
+        Call<ResponseBody> call = client.modify_status(up);
+
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                try {
+                    // thong bao ok cho user
+                    new AlertDialog.Builder(activity)
+                            .setTitle("Change notification")
+                            .setMessage("Status changed successfully!")
+                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            })
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .show();
+                    // thay doi mau sac tren UI: 2 cho~
+                    for(int i = 0; i < stu_list.size(); i++) {
+                        Item_student tmp_stu = stu_list.get(i);
+                        if(tmp_stu.getId().compareTo(student_id) == 0) {
+                            tmp_stu.modifyHistory(old_status, -1);
+                            tmp_stu.modifyHistory(status, 1);
+                            tmp_stu.setCurrent_status(status);
+
+                            stu_list.set(i, tmp_stu);
+                            adapter.notifyDataSetChanged();
+                        }
+                        break;
+                    }
+                }
+                catch (Exception e) {
+                    Toast.makeText(StudentListActivity.this, "action failed!", Toast.LENGTH_LONG).show();
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Toast.makeText(StudentListActivity.this, "action failed!", Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     List getStudentList() {

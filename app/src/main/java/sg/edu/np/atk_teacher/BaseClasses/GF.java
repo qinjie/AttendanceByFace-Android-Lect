@@ -6,6 +6,8 @@ import android.content.SharedPreferences;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import sg.edu.np.atk_teacher.LoginActivity;
 
 /**
@@ -25,17 +27,35 @@ public class GF {
 
     public static void logoutAction(Activity activity) {
         SharedPreferences pref = activity.getSharedPreferences("ATK_pref", 0);
-        String auCode = pref.getString("authorizationCode", null);
-
         SharedPreferences.Editor editor = pref.edit();
         editor.clear();
         editor.apply();
 
         StringClient client = ServiceGenerator.createService(StringClient.class);
         Call<ResponseBody> call = client.logout();
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+            }
+        });
 
         Intent intent = new Intent(activity, LoginActivity.class);
         activity.startActivity(intent);
+    }
+
+    public static void setAuCodeInSP(Activity activity, String authorizationCode) {
+        GV.auCode = "Bearer " + authorizationCode;
+
+        SharedPreferences pref = activity.getSharedPreferences("ATK_pref", 0);
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putString("authorizationCode", "Bearer " + authorizationCode);
+        editor.apply();
     }
 
 }

@@ -50,9 +50,6 @@ public class LoginActivity extends AppCompatActivity {
 
         GV.activity = LoginActivity.this;
 
-        if(GF.alreadyLoggedIn(this))
-            onLoginSuccess();
-
         _loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -99,8 +96,8 @@ public class LoginActivity extends AppCompatActivity {
         String username = _usernameText.getText().toString();
         String password = _passwordText.getText().toString();
 
-        username = "pppp";
-        password = "pppppp";
+        username = "abab";
+        password = "123456";
 
         StringClient client = ServiceGenerator.createService(StringClient.class);
 
@@ -117,20 +114,20 @@ public class LoginActivity extends AppCompatActivity {
                     if (messageCode == 200) {
                         JSONObject data = new JSONObject(response.body().string());
                         String authorizationCode = data.getString("token");
-                        GV.setAuCodeInSP(LoginActivity.this, authorizationCode);
+                        GF.setAuCodeInSP(LoginActivity.this, authorizationCode);
                         onLoginSuccess();
                     }
                     else if(messageCode == 400) {
                         JSONObject data = new JSONObject(response.errorBody().string());
                         int errorCode = data.getInt("code");
-                        onLoginFailed();
+                        onLoginFailed(0);
 //                        Notification.showLoginNoti(activity, errorCode);
                     }
                     else {
 //                        ErrorClass.showError(LogInActivity.this, 1);
                     }
                 } catch (Exception e) {
-                    onLoginFailed();
+                    onLoginFailed(0);
                     e.printStackTrace();
 //                    ErrorClass.showError(LogInActivity.this, 2);
                 }
@@ -139,7 +136,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
                 System.out.print("Error Login");
-                onLoginFailed();
+                onLoginFailed(1);
 //                ErrorClass.showError(LogInActivity.this, 3);
             }
         });
@@ -153,8 +150,11 @@ public class LoginActivity extends AppCompatActivity {
         finish();
     }
 
-    private void onLoginFailed() {
-        Toast.makeText(getBaseContext(), "Login failed", Toast.LENGTH_LONG).show();
+    private void onLoginFailed(int errorCode) {
+        if(errorCode == 0)
+            Toast.makeText(getBaseContext(), "Login failed, code != 200", Toast.LENGTH_LONG).show();
+        if(errorCode == 1)
+            Toast.makeText(getBaseContext(), "Login failed, no internet", Toast.LENGTH_LONG).show();
         _loginButton.setEnabled(true);
     }
 

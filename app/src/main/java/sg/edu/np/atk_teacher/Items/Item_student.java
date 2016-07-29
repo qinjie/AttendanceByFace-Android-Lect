@@ -1,5 +1,7 @@
 package sg.edu.np.atk_teacher.Items;
 
+import sg.edu.np.atk_teacher.BaseClasses.GV;
+
 /**
  * Created by Lord One on 7/19/2016.
  */
@@ -55,5 +57,30 @@ public class Item_student implements Comparable<Item_student>{
         }
         else
             throw new IllegalArgumentException();
+    }
+
+    public void setCurrent_status(int current_status) {
+        this.current_status = current_status;
+    }
+
+    public void setHistory_n_attend(int history_n_attend) {
+        this.history_n_attend = history_n_attend;
+    }
+
+    public void setHistory_n_late(int history_n_late) {
+        this.history_n_late = history_n_late;
+    }
+
+    public void setHistory_n_absent(int history_n_absent) {
+        this.history_n_absent = history_n_absent;
+    }
+
+    public void modifyHistory(int status, int ntimes) {
+        if(status == GV.attend_code)
+            history_n_attend += ntimes;
+        if(status == GV.late_code)
+            history_n_late += ntimes;
+        if(status == GV.absent_code)
+            history_n_absent += ntimes;
     }
 }

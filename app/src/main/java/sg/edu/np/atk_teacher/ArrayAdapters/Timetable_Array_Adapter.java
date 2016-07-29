@@ -55,7 +55,11 @@ public class Timetable_Array_Adapter extends ArrayAdapter<Item_timetable> {
             ImageView imageCity = (ImageView) v.findViewById(R.id.percent_history_image);
 
             Drawable image = null;
-            int percent_taken = o.getN_students_taken() * 100 / o.getN_students();
+            int percent_taken;
+            if(o.getN_students() > 0)
+                percent_taken = o.getN_students_taken() * 100 / o.getN_students();
+            else
+                percent_taken = 0;
             if(percent_taken >=  90)
                 image = ContextCompat.getDrawable(c, R.drawable.dark_green_round_with_stroke);
             else if(percent_taken >= 50)
@@ -67,7 +71,7 @@ public class Timetable_Array_Adapter extends ArrayAdapter<Item_timetable> {
 
 
             if(t1!=null)
-                t1.setText(o.getClass_id());
+                t1.setText(o.getLesson_id());
             if(t2!=null)
                 t2.setText(o.getSubject_name());
             if(t3!=null)

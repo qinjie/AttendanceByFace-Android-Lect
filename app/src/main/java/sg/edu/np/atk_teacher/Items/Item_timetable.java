@@ -4,7 +4,6 @@ package sg.edu.np.atk_teacher.Items;
  * Created by Lord One on 7/20/2016.
  */
 public class Item_timetable {
-    private String class_id;
     private String subject_name;
     private String lesson_id;
     private int start_hour;
@@ -16,9 +15,8 @@ public class Item_timetable {
     private int n_students;
 
 
-    public Item_timetable(String class_id, String subject_name, String lesson_id, int start_hour, int start_minute,
+    public Item_timetable(String subject_name, String lesson_id, int start_hour, int start_minute,
                      int end_hour, int end_minute, String date, int n_students_taken, int n_students) {
-        this.class_id = class_id;
         this.subject_name = subject_name;
         this.lesson_id = lesson_id;
         this.start_hour = start_hour;
@@ -28,10 +26,6 @@ public class Item_timetable {
         this.date = date;
         this.n_students_taken = n_students_taken;
         this.n_students = n_students;
-    }
-
-    public String getClass_id() {
-        return class_id;
     }
 
     public String getSubject_name() {
@@ -71,7 +65,8 @@ public class Item_timetable {
     }
 
     public String getTimeAndDate() {
-        return "8:00 - 10:00, 7/14/2016"; //TODO
+        return String.format("%02d", start_hour) + ":" + String.format("%02d", start_minute) +
+                " - " + String.format("%02d", end_hour) + ":" + String.format("%02d", end_minute) + ", " + date;
     }
 
     public int compareTo(Item_timetable o) {

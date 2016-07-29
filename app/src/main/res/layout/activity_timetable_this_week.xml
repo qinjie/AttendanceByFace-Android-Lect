@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Timetable This Week"
+        android:id="@+id/textView2"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/scrollView"
+        android:layout_gravity="center_horizontal" >
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Monday"
+                android:background="@drawable/spinner_item_border"
+                android:id="@+id/text_mon" />
+            <LinearLayout
+                android:orientation="vertical"
+                android:id="@+id/lay_mon"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/timetable_this_week_each_day">
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Tuesday"
+                android:background="@drawable/spinner_item_border"
+                android:id="@+id/text_tue" />
+            <LinearLayout
+                android:orientation="vertical"
+                android:id="@+id/lay_tue"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"></LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Wednesday"
+                android:background="@drawable/spinner_item_border"
+                android:id="@+id/text_wed" />
+            <LinearLayout
+                android:orientation="vertical"
+                android:id="@+id/lay_wed"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"></LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Thursday"
+                android:background="@drawable/spinner_item_border"
+                android:id="@+id/text_thu" />
+            <LinearLayout
+                android:orientation="vertical"
+                android:id="@+id/lay_thu"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"></LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Friday"
+                android:background="@drawable/spinner_item_border"
+                android:id="@+id/text_fri" />
+            <LinearLayout
+                android:orientation="vertical"
+                android:id="@+id/lay_fri"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"></LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Saturday"
+                android:background="@drawable/spinner_item_border"
+                android:id="@+id/text_sat" />
+            <LinearLayout
+                android:orientation="vertical"
+                android:id="@+id/lay_sat"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"></LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Sunday"
+                android:background="@drawable/spinner_item_border"
+                android:id="@+id/text_sun" />
+            <LinearLayout
+                android:orientation="vertical"
+                android:id="@+id/lay_sun"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"></LinearLayout>
+
+
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

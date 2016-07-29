@@ -3,6 +3,7 @@ package sg.edu.np.atk_teacher;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -20,18 +21,31 @@ import android.widget.DatePicker;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.Toast;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
 import butterknife.ButterKnife;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import sg.edu.np.atk_teacher.BaseClasses.GF;
 import sg.edu.np.atk_teacher.BaseClasses.GV;
+import sg.edu.np.atk_teacher.BaseClasses.ServiceGenerator;
+import sg.edu.np.atk_teacher.BaseClasses.StringClient;
 import sg.edu.np.atk_teacher.Items.Item_timetable;
 import sg.edu.np.atk_teacher.ArrayAdapters.Timetable_Array_Adapter;
+import sg.edu.np.atk_teacher.UtilityClasses.LoginClass;
+import sg.edu.np.atk_teacher.UtilityClasses.TimetableClass;
 
 public class TimeTableActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -46,8 +60,11 @@ public class TimeTableActivity extends AppCompatActivity
     private ImageButton date_picker;
     private final String ALL_SUBJECT = "All Subjects";
     private String curr_subject = ALL_SUBJECT;
-    private String auCode;
+    private String curr_date;
     private Activity activity;
+    final List<Item_timetable> timetable_list = new ArrayList<>();
+    ArrayList<String> options = new ArrayList<String>();
+    ArrayAdapter<String> options_adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +73,9 @@ public class TimeTableActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        options_adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, options);
+
+        initDate();
         activity = this;
         date_picker = (ImageButton) findViewById(R.id.datePickerButt);
         spinner = (Spinner) findViewById(R.id.spinner);
@@ -71,8 +91,7 @@ public class TimeTableActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-
-        final List<Item_timetable> timetable_list = getTimetableList();
+        getDropdownList();
 
         adapter = new Timetable_Array_Adapter(TimeTableActivity.this, R.layout.item_timetable_view, timetable_list);
 
@@ -95,10 +114,8 @@ public class TimeTableActivity extends AppCompatActivity
                         if(lastItem == totalItemCount) {
                             if(preLast!=lastItem) {
                                 preLast = lastItem;
-                                //TODO:complete this using request to server
-                                List<Item_timetable> additional_list = getTimetableList();
-                                timetable_list.addAll(additional_list);
-                                adapter.notifyDataSetChanged();
+                                Toast.makeText(TimeTableActivity.this, "loading data...", Toast.LENGTH_SHORT).show();
+                                getTimetableList(false);
                             }
                         }
                 }
@@ -120,6 +137,7 @@ public class TimeTableActivity extends AppCompatActivity
                     intent.putExtra("lessonId", item.getLesson_id());
                     intent.putExtra("startHour", item.getStart_hour());
                     intent.putExtra("startMinute", item.getStart_minute());
+                    intent.putExtra("recordedDate", item.getDate());
 
                     startActivity(intent);
                 }
@@ -127,27 +145,11 @@ public class TimeTableActivity extends AppCompatActivity
         });
 
 
-        HashSet<String> unique_subjects = new HashSet<>();
-        for(Item_timetable item : timetable_list) {
-            unique_subjects.add(item.getSubject_name());
-        }
-        ArrayList<String> options = new ArrayList<String>();
-        options.add(ALL_SUBJECT);
-        for(String subject : unique_subjects)
-            options.add(subject);
-        final ArrayAdapter<String> options_adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, options);
-        options_adapter.setDropDownViewResource(R.layout.spinner_layout);
-        spinner.setAdapter(options_adapter);
-
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-
-                curr_subject = options_adapter.getItem(position);;
-
-                timetable_list.clear();
-                timetable_list.addAll(getTimetableList());
-                adapter.notifyDataSetChanged();
+                    curr_subject = options_adapter.getItem(position);
+                    getTimetableList(true);
             }
 
             @Override
@@ -173,15 +175,18 @@ public class TimeTableActivity extends AppCompatActivity
 
     private DatePickerDialog.OnDateSetListener datePickerListener = new DatePickerDialog.OnDateSetListener() {
 
-        // this method will call on close dialog box
+        @Override
         public void onDateSet(DatePicker view, int selectedYear,
                               int selectedMonth, int selectedDay) {
+            if (view.isShown()) {
 
-            int year = selectedYear;
-            int month = selectedMonth;
-            int day = selectedDay;
-            //TODO: above is time chosen
+                int year = selectedYear;
+                int month = selectedMonth + 1;
+                int day = selectedDay;
 
+                curr_date = year + "-" + String.format("%02d", month) + "-" + String.format("%02d", day);
+                getTimetableList(true);
+            }
         }
     };
 
@@ -222,8 +227,10 @@ public class TimeTableActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-
-        if (id == R.id.nav_change_password) {
+        if(id == R.id.nav_timetable_this_week) {
+            Intent intent = new Intent(this, TimetableThisWeekActivity.class);
+            startActivity(intent);
+        }else if (id == R.id.nav_change_password) {
             Intent intent = new Intent(this, ChangePasswordActivity.class);
             startActivityForResult(intent, REQUEST_CHANGEPASSWORD);
         } else if (id == R.id.nav_log_out) {
@@ -235,25 +242,118 @@ public class TimeTableActivity extends AppCompatActivity
         return true;
     }
 
-    List getTimetableList() {
-        List<Item_timetable> timetables = new ArrayList<Item_timetable>();
-        //TODO: get data from server, according to curr_subject and curr_date
-        timetables.add(new Item_timetable("NP0101", "Discrete Math", "abc", 8, 0, 10, 0, "7/14/2016", 7, 15));
-        timetables.add(new Item_timetable("NP0101", "Literature", "abc", 8, 0, 10, 0, "7/13/2016", 8, 15));
-        timetables.add(new Item_timetable("NP0101", "Discrete Math", "abc", 8, 0, 10, 0, "7/14/2016", 9, 15));
-        timetables.add(new Item_timetable("NP0101", "Literature", "abc", 8, 0, 10, 0, "7/13/2016", 10, 20));
-        timetables.add(new Item_timetable("NP0101", "Discrete Math", "abc", 8, 0, 10, 0, "7/14/2016", 11, 15));
-        timetables.add(new Item_timetable("NP0101", "Literature", "abc", 8, 0, 10, 0, "7/13/2016", 12, 20));
-        timetables.add(new Item_timetable("NP0101", "Discrete Math", "abc", 8, 0, 10, 0, "7/14/2016", 13, 20));
-        timetables.add(new Item_timetable("NP0101", "Literature", "abc", 8, 0, 10, 0, "7/13/2016", 14, 15));
-        timetables.add(new Item_timetable("NP0101", "Discrete Math", "abc", 8, 0, 10, 0, "7/14/2016", 15, 20));
-        timetables.add(new Item_timetable("NP0101", "Literature", "abc", 8, 0, 10, 0, "7/13/2016", 16, 20));
-        timetables.add(new Item_timetable("NP0101", "Discrete Math", "abc", 8, 0, 10, 0, "7/14/2016", 1, 15));
-        timetables.add(new Item_timetable("NP0101", "Literature", "abc", 8, 0, 10, 0, "7/13/2016", 2, 15));
+    void initDate() {
+        Date date = new Date();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        int year = cal.get(Calendar.YEAR);
+        String month = String.format("%02d", cal.get(Calendar.MONTH) + 1);
+        String day = String.format("%02d", cal.get(Calendar.DAY_OF_MONTH));
 
-        return timetables;
+        curr_date = year + "-" + month + "-" + day;
     }
 
+    void getDropdownList() {
+        StringClient client = ServiceGenerator.createService(StringClient.class, GV.auCode);
+        Call<ResponseBody> call = client.getLecturerSubjectList();
+
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if(response.code() == 200) {
+                    try {
+                        options.clear();
+                        String _data = response.body().string();
+                        _data = _data.replace("[", "").replace("]", "").replace("\"", "");
+                        List<String> data = new ArrayList<String>(Arrays.asList(_data.split(",")));
+                        options.add(ALL_SUBJECT);
+                        options.addAll(data);
+                        options_adapter.setDropDownViewResource(R.layout.spinner_layout);
+                        spinner.setAdapter(options_adapter);
+                    }
+                    catch (Exception e){}
+                }
+                else {
+                    Toast.makeText(TimeTableActivity.this, "authentication failed", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+            }
+        });
+    }
+
+    void getTimetableList(boolean toReset) {
+        if(toReset)
+            timetable_list.clear();
+
+        StringClient client = ServiceGenerator.createService(StringClient.class, GV.auCode);
+
+        String classSection;
+        if(curr_subject.compareTo(ALL_SUBJECT) == 0)
+            classSection = "all";
+        else
+            classSection = curr_subject;
+        Call<ResponseBody> call = client.getListClasses(curr_date, classSection);
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if(response.code() == 200) {
+                    try {
+                        JSONObject body = new JSONObject(response.body().string());
+                        JSONArray timetable = body.getJSONArray("timetable");
+                        curr_date = body.getString("nextFromDate");
+
+                        for(int i = 0; i < timetable.length(); i++) {
+                            JSONObject data = timetable.getJSONObject(i);
+                            int start_hour = Integer.valueOf(data.getString("start_time").substring(0, 2));
+                            int start_minute = Integer.valueOf(data.getString("start_time").substring(3, 5));
+                            int end_hour = Integer.valueOf(data.getString("end_time").substring(0, 2));
+                            int end_minute = Integer.valueOf(data.getString("start_time").substring(3, 5));
+                            Item_timetable item = new Item_timetable(data.getString("class_section"), data.getString("lesson_id"),
+                                                                     start_hour, start_minute, end_hour, end_minute,
+                                                                     data.getString("date"), data.getInt("presentStudent"), data.getInt("totalStudent"));
+                            timetable_list.add(item);
+                        }
+                        adapter.notifyDataSetChanged();
+                    }
+                    catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                else {
+                    Toast.makeText(TimeTableActivity.this, "Load Timetable error code " + response.code(), Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+            }
+        });
+
+    }
+
+//    List getHardCodeTimetableList() {
+//        List<Item_timetable> timetables = new ArrayList<Item_timetable>();
+//        //TODO: get data from server, according to curr_subject and curr_date
+//        timetables.add(new Item_timetable("NP0101", "Discrete Math", "abc", 8, 0, 10, 0, "7/14/2016", 7, 15));
+//        timetables.add(new Item_timetable("NP0101", "Literature", "abc", 8, 0, 10, 0, "7/13/2016", 8, 15));
+//        timetables.add(new Item_timetable("NP0101", "Discrete Math", "abc", 8, 0, 10, 0, "7/14/2016", 9, 15));
+//        timetables.add(new Item_timetable("NP0101", "Literature", "abc", 8, 0, 10, 0, "7/13/2016", 10, 20));
+//        timetables.add(new Item_timetable("NP0101", "Discrete Math", "abc", 8, 0, 10, 0, "7/14/2016", 11, 15));
+//        timetables.add(new Item_timetable("NP0101", "Literature", "abc", 8, 0, 10, 0, "7/13/2016", 12, 20));
+//        timetables.add(new Item_timetable("NP0101", "Discrete Math", "abc", 8, 0, 10, 0, "7/14/2016", 13, 20));
+//        timetables.add(new Item_timetable("NP0101", "Literature", "abc", 8, 0, 10, 0, "7/13/2016", 14, 15));
+//        timetables.add(new Item_timetable("NP0101", "Discrete Math", "abc", 8, 0, 10, 0, "7/14/2016", 15, 20));
+//        timetables.add(new Item_timetable("NP0101", "Literature", "abc", 8, 0, 10, 0, "7/13/2016", 16, 20));
+//        timetables.add(new Item_timetable("NP0101", "Discrete Math", "abc", 8, 0, 10, 0, "7/14/2016", 1, 15));
+//        timetables.add(new Item_timetable("NP0101", "Literature", "abc", 8, 0, 10, 0, "7/13/2016", 2, 15));
+//
+//        return timetables;
+//    }
 
 
 }
