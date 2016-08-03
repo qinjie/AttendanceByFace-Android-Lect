@@ -3,6 +3,10 @@
 
     <group android:checkableBehavior="single">
         <item
+            android:id="@+id/nav_current_classes"
+            android:icon="@drawable/ic_menu_send"
+            android:title="Current classes" />
+        <item
             android:id="@+id/nav_timetable_this_week"
             android:icon="@drawable/ic_menu_slideshow"
             android:title="Timetable this week" />
@@ -16,7 +20,7 @@
             android:title="Change Password" />
         <item
             android:id="@+id/nav_log_out"
-            android:icon="@drawable/ic_menu_send"
+            android:icon="@drawable/ic_menu_thunder"
             android:title="Log out" />
     </group>
 

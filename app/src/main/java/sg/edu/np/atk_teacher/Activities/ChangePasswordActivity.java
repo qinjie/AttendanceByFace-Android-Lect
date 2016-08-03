@@ -27,7 +27,7 @@ import sg.edu.np.atk_teacher.R;
 /**
  * Created by Lord One on 7/21/2016.
  */
-public class ChangePasswordActivity extends TimeTableActivity {
+public class ChangePasswordActivity extends NavActivity {
     @InjectView(R.id.input_old_password_cpd)    EditText _currentpasswordText;
     @InjectView(R.id.input_password_cpd)        EditText _newPasswordText;
     @InjectView(R.id.input_confirmpass_cpd)     EditText _confirmedPasswordText;

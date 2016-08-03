@@ -23,10 +23,10 @@ public interface StringClient {
     @GET("user/logout")
     Call<ResponseBody> logout();
 
-    @GET("timetable/current-semester-test")
+    @GET("timetable/current-semester")
     Call<ResponseBody> getListClasses(@Query("fromDate") String fromDate, @Query("classSection") String classSection);
 
-    @GET("lesson/list-class-section-for-lecturer-test")
+    @GET("lesson/list-class-section-for-lecturer")
     Call<ResponseBody> getLecturerSubjectList();
 
     @GET("timetable/list-student-for-lesson")

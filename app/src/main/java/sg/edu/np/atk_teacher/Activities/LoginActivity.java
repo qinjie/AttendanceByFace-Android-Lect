@@ -52,7 +52,7 @@ public class LoginActivity extends AppCompatActivity {
 
         GV.activity = LoginActivity.this;
 
-//        login();
+        login();
         _loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -100,8 +100,8 @@ public class LoginActivity extends AppCompatActivity {
         String username = _usernameText.getText().toString();
         String password = _passwordText.getText().toString();
 
-        username = "kkkk";
-        password = "kkkkkk";
+        username = "abab";
+        password = "123456";
 
         StringClient client = ServiceGenerator.createService(StringClient.class);
 

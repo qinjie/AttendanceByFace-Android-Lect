@@ -43,7 +43,7 @@ import sg.edu.np.atk_teacher.ArrayAdapters.Student_List_Array_Adapter;
 import sg.edu.np.atk_teacher.R;
 import sg.edu.np.atk_teacher.RequestClasses.ModifyStatusClass;
 
-public class StudentListActivity extends TimeTableActivity {
+public class StudentListActivity extends NavActivity {
 
     TextView title;
     ListView listView;

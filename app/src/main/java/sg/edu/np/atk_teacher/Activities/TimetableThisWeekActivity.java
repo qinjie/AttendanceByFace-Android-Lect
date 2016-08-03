@@ -30,7 +30,7 @@ import sg.edu.np.atk_teacher.R;
 /**
  * Created by Champ on 29/07/2016.
  */
-public class TimetableThisWeekActivity extends TimeTableActivity {
+public class TimetableThisWeekActivity extends NavActivity {
 
     LinearLayout lay2, lay3, lay4, lay5, lay6, lay7, lay8;
     ArrayList<LinearLayout> tv_list;
