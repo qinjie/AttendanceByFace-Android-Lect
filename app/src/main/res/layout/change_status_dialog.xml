@@ -23,7 +23,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="Student Name"
-        android:id="@+id/student_name"
+        android:id="@+id/student_name_of_change_stt"
         android:gravity="center_horizontal" />
 
     <TextView
@@ -31,7 +31,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="Student ID"
-        android:id="@+id/student_id"
+        android:id="@+id/student_id_of_change_stt"
         android:gravity="center_horizontal" />
 
     <ImageView
@@ -46,8 +46,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Subject Name"
-        android:id="@+id/subject_name"
+        android:text="Class Section"
+        android:id="@+id/class_section_of_change_stt"
         android:gravity="center_horizontal" />
 
     <TextView
@@ -56,14 +56,15 @@
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="Class ID"
         android:id="@+id/class_id"
-        android:gravity="center_horizontal" />
+        android:gravity="center_horizontal"
+        android:visibility="gone" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="Time and Date"
-        android:id="@+id/timeanddate"
+        android:id="@+id/timeanddate_of_change_stt"
         android:gravity="center_horizontal" />
 
     <TextView
@@ -71,7 +72,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="Location"
-        android:id="@+id/location"
+        android:id="@+id/location_of_change_stt"
         android:gravity="center_horizontal" />
 
     <RelativeLayout
@@ -92,7 +93,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Present"
-                android:textColor="#0b7101"
+                android:textColor="#4CAF50"
                 android:textSize="20dp" />
 
             <RadioButton
@@ -100,7 +101,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Late"
-                android:textColor="#fb9400"
+                android:textColor="#FFC107"
                 android:textSize="20dp" />
 
             <RadioButton
@@ -108,7 +109,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Absent"
-                android:textColor="#960101"
+                android:textColor="#F44336"
                 android:textSize="20dp" />
         </RadioGroup>
 

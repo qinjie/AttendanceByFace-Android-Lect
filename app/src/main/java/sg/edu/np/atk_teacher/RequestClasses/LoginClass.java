@@ -1,8 +1,4 @@
-package sg.edu.np.atk_teacher.UtilityClasses;
-
-import android.content.Context;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
+package sg.edu.np.atk_teacher.RequestClasses;
 
 /**
  * Created by Lord One on 7/26/2016.

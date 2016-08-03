@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Enter student ID:"
+        android:id="@+id/dia_sid_label"
+        android:layout_gravity="center_horizontal"
+        android:textSize="25sp"
+        android:textAlignment="center" />
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dip"
+        android:layout_marginBottom="5dip">
+        <EditText android:id="@+id/dia_input_sid"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="student ID" />
+    </android.support.design.widget.TextInputLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text=""
+        android:id="@+id/dia_noti"
+        android:layout_gravity="center_horizontal"
+        android:textAlignment="center"/>
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cancel"
+            android:id="@+id/dia_cancel"
+            android:layout_weight="1" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Disallow"
+            android:id="@+id/dia_disallow"
+            android:layout_weight="1" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Allow"
+            android:id="@+id/dia_allow"
+            android:layout_weight="1" />
+    </TableRow>
+
+
+
+
+</LinearLayout>

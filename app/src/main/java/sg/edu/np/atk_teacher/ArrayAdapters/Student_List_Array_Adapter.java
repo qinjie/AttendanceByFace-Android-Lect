@@ -71,7 +71,7 @@ public class Student_List_Array_Adapter extends ArrayAdapter<Item_student>{
             if(t1!=null)
                 t1.setText(o.getName());
             if(t2!=null)
-                t2.setText(o.getId());
+                t2.setText("ID: " + o.getId());
 
             TextView tmp;
             tmp = (TextView) v.findViewById(R.id.his_attend_text);

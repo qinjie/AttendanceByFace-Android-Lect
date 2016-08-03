@@ -1,9 +1,11 @@
-package sg.edu.np.atk_teacher;
+package sg.edu.np.atk_teacher.Activities;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.content.Intent;
-import android.os.AsyncTask;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -17,11 +19,17 @@ import android.view.MenuItem;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.gson.JsonObject;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -30,7 +38,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 
 import butterknife.ButterKnife;
@@ -38,19 +45,22 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import sg.edu.np.atk_teacher.AuxiliaryClasses.ProgressDia;
+import sg.edu.np.atk_teacher.BaseClasses.ErrorClass;
 import sg.edu.np.atk_teacher.BaseClasses.GF;
 import sg.edu.np.atk_teacher.BaseClasses.GV;
 import sg.edu.np.atk_teacher.BaseClasses.ServiceGenerator;
 import sg.edu.np.atk_teacher.BaseClasses.StringClient;
 import sg.edu.np.atk_teacher.Items.Item_timetable;
 import sg.edu.np.atk_teacher.ArrayAdapters.Timetable_Array_Adapter;
-import sg.edu.np.atk_teacher.UtilityClasses.LoginClass;
-import sg.edu.np.atk_teacher.UtilityClasses.TimetableClass;
+import sg.edu.np.atk_teacher.R;
 
 public class TimeTableActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final int REQUEST_CHANGEPASSWORD = 1;
+
+    protected FrameLayout frameLayout;
 
     Timetable_Array_Adapter adapter;
     ListView listView;
@@ -61,6 +71,7 @@ public class TimeTableActivity extends AppCompatActivity
     private final String ALL_SUBJECT = "All Subjects";
     private String curr_subject = ALL_SUBJECT;
     private String curr_date;
+    private int chosenPosition;
     private Activity activity;
     final List<Item_timetable> timetable_list = new ArrayList<>();
     ArrayList<String> options = new ArrayList<String>();
@@ -70,6 +81,8 @@ public class TimeTableActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_timetable);
+        frameLayout = (FrameLayout)findViewById(R.id.content_frame);
+//        getLayoutInflater().inflate(R.layout.activity_timetable, frameLayout);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -80,7 +93,7 @@ public class TimeTableActivity extends AppCompatActivity
         date_picker = (ImageButton) findViewById(R.id.datePickerButt);
         spinner = (Spinner) findViewById(R.id.spinner);
 
-        ButterKnife.inject(this);
+//        ButterKnife.inject(this);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -114,7 +127,7 @@ public class TimeTableActivity extends AppCompatActivity
                         if(lastItem == totalItemCount) {
                             if(preLast!=lastItem) {
                                 preLast = lastItem;
-                                Toast.makeText(TimeTableActivity.this, "loading data...", Toast.LENGTH_SHORT).show();
+//                                Toast.makeText(TimeTableActivity.this, "loading data...", Toast.LENGTH_SHORT).show();
                                 getTimetableList(false);
                             }
                         }
@@ -131,15 +144,20 @@ public class TimeTableActivity extends AppCompatActivity
                 if(sepTime > 1000) {
                     preDate = currDate;
 
+                    chosenPosition = position;
                     Item_timetable item = adapter.getItem(position);
 
                     Intent intent = new Intent(TimeTableActivity.this, StudentListActivity.class);
                     intent.putExtra("lessonId", item.getLesson_id());
                     intent.putExtra("startHour", item.getStart_hour());
                     intent.putExtra("startMinute", item.getStart_minute());
+                    intent.putExtra("endHour", item.getEnd_hour());
+                    intent.putExtra("endMinute", item.getEnd_minute());
                     intent.putExtra("recordedDate", item.getDate());
+                    intent.putExtra("classSection", item.getClass_section());
+                    intent.putExtra("location", item.getLocation());
 
-                    startActivity(intent);
+                    startActivityForResult(intent, 0);
                 }
             }
         });
@@ -191,6 +209,16 @@ public class TimeTableActivity extends AppCompatActivity
     };
 
     @Override
+    public void onActivityResult(int request_code, int result_code, Intent data) {
+        if(request_code == 0 && result_code != 0) {
+            Item_timetable tmp_timetable = timetable_list.get(chosenPosition);
+            tmp_timetable.add_to_n_students_taken(result_code);
+            timetable_list.set(chosenPosition, tmp_timetable);
+            adapter.notifyDataSetChanged();
+        }
+    }
+
+    @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
@@ -230,7 +258,9 @@ public class TimeTableActivity extends AppCompatActivity
         if(id == R.id.nav_timetable_this_week) {
             Intent intent = new Intent(this, TimetableThisWeekActivity.class);
             startActivity(intent);
-        }else if (id == R.id.nav_change_password) {
+        } else if (id == R.id.nav_allow_train_face) {
+            allowTrainFace();
+        } else if (id == R.id.nav_change_password) {
             Intent intent = new Intent(this, ChangePasswordActivity.class);
             startActivityForResult(intent, REQUEST_CHANGEPASSWORD);
         } else if (id == R.id.nav_log_out) {
@@ -254,6 +284,7 @@ public class TimeTableActivity extends AppCompatActivity
     }
 
     void getDropdownList() {
+        ProgressDia.showDialog(this);
         StringClient client = ServiceGenerator.createService(StringClient.class, GV.auCode);
         Call<ResponseBody> call = client.getLecturerSubjectList();
 
@@ -270,22 +301,27 @@ public class TimeTableActivity extends AppCompatActivity
                         options.addAll(data);
                         options_adapter.setDropDownViewResource(R.layout.spinner_layout);
                         spinner.setAdapter(options_adapter);
+
+                        onGetDropdownListSuccess();
                     }
-                    catch (Exception e){}
+                    catch (Exception e){
+                        onGetDropdownListFailed(ErrorClass.wrongFormat_err);
+                    }
                 }
                 else {
-                    Toast.makeText(TimeTableActivity.this, "authentication failed", Toast.LENGTH_SHORT).show();
+                    onGetDropdownListFailed(ErrorClass.unauthorized_err);
                 }
             }
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-
+                onGetDropdownListFailed(ErrorClass.internet_err);
             }
         });
     }
 
-    void getTimetableList(boolean toReset) {
+    void getTimetableList(final boolean toReset) {
+        ProgressDia.showDialog(this);
         if(toReset)
             timetable_list.clear();
 
@@ -306,54 +342,182 @@ public class TimeTableActivity extends AppCompatActivity
                         JSONArray timetable = body.getJSONArray("timetable");
                         curr_date = body.getString("nextFromDate");
 
-                        for(int i = 0; i < timetable.length(); i++) {
-                            JSONObject data = timetable.getJSONObject(i);
-                            int start_hour = Integer.valueOf(data.getString("start_time").substring(0, 2));
-                            int start_minute = Integer.valueOf(data.getString("start_time").substring(3, 5));
-                            int end_hour = Integer.valueOf(data.getString("end_time").substring(0, 2));
-                            int end_minute = Integer.valueOf(data.getString("start_time").substring(3, 5));
-                            Item_timetable item = new Item_timetable(data.getString("class_section"), data.getString("lesson_id"),
-                                                                     start_hour, start_minute, end_hour, end_minute,
-                                                                     data.getString("date"), data.getInt("presentStudent"), data.getInt("totalStudent"));
-                            timetable_list.add(item);
+                        if(timetable.length() > 0) {
+                            for (int i = 0; i < timetable.length(); i++) {
+                                JSONObject data = timetable.getJSONObject(i);
+                                int start_hour = Integer.valueOf(data.getString("start_time").substring(0, 2));
+                                int start_minute = Integer.valueOf(data.getString("start_time").substring(3, 5));
+                                int end_hour = Integer.valueOf(data.getString("end_time").substring(0, 2));
+                                int end_minute = Integer.valueOf(data.getString("start_time").substring(3, 5));
+                                Item_timetable item = new Item_timetable(data.getString("class_section"), data.getString("lesson_id"),
+                                        start_hour, start_minute, end_hour, end_minute,
+                                        data.getString("date"), data.getInt("presentStudent"), data.getInt("totalStudent"),
+                                        data.getString("location"));
+                                timetable_list.add(item);
+                            }
+                            adapter.notifyDataSetChanged();
                         }
-                        adapter.notifyDataSetChanged();
+                        else {
+                            if(toReset)
+                                Toast.makeText(TimeTableActivity.this, "No data", Toast.LENGTH_LONG).show();
+                            else
+                                Toast.makeText(TimeTableActivity.this, "No more data", Toast.LENGTH_LONG).show();
+                        }
+                        onGetStudentListSuccess();
                     }
                     catch (Exception e) {
+                        onGetStudentListFailed(ErrorClass.wrongFormat_err);
                         e.printStackTrace();
                     }
                 }
                 else {
-                    Toast.makeText(TimeTableActivity.this, "Load Timetable error code " + response.code(), Toast.LENGTH_SHORT).show();
+                    onGetStudentListFailed(ErrorClass.unauthorized_err);
                 }
             }
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-
+                onGetStudentListFailed(ErrorClass.internet_err);
             }
         });
 
     }
 
-//    List getHardCodeTimetableList() {
-//        List<Item_timetable> timetables = new ArrayList<Item_timetable>();
-//        //TODO: get data from server, according to curr_subject and curr_date
-//        timetables.add(new Item_timetable("NP0101", "Discrete Math", "abc", 8, 0, 10, 0, "7/14/2016", 7, 15));
-//        timetables.add(new Item_timetable("NP0101", "Literature", "abc", 8, 0, 10, 0, "7/13/2016", 8, 15));
-//        timetables.add(new Item_timetable("NP0101", "Discrete Math", "abc", 8, 0, 10, 0, "7/14/2016", 9, 15));
-//        timetables.add(new Item_timetable("NP0101", "Literature", "abc", 8, 0, 10, 0, "7/13/2016", 10, 20));
-//        timetables.add(new Item_timetable("NP0101", "Discrete Math", "abc", 8, 0, 10, 0, "7/14/2016", 11, 15));
-//        timetables.add(new Item_timetable("NP0101", "Literature", "abc", 8, 0, 10, 0, "7/13/2016", 12, 20));
-//        timetables.add(new Item_timetable("NP0101", "Discrete Math", "abc", 8, 0, 10, 0, "7/14/2016", 13, 20));
-//        timetables.add(new Item_timetable("NP0101", "Literature", "abc", 8, 0, 10, 0, "7/13/2016", 14, 15));
-//        timetables.add(new Item_timetable("NP0101", "Discrete Math", "abc", 8, 0, 10, 0, "7/14/2016", 15, 20));
-//        timetables.add(new Item_timetable("NP0101", "Literature", "abc", 8, 0, 10, 0, "7/13/2016", 16, 20));
-//        timetables.add(new Item_timetable("NP0101", "Discrete Math", "abc", 8, 0, 10, 0, "7/14/2016", 1, 15));
-//        timetables.add(new Item_timetable("NP0101", "Literature", "abc", 8, 0, 10, 0, "7/13/2016", 2, 15));
-//
-//        return timetables;
-//    }
+    void allowTrainFace() {
 
+        final Dialog dialog = new Dialog(this);
+        dialog.setTitle("Allow train face");
+        dialog.setContentView(R.layout.train_face_dialog);
+
+        final EditText stu_id_text = (EditText) dialog.findViewById(R.id.dia_input_sid);
+        Button cancel_btn = (Button) dialog.findViewById(R.id.dia_cancel);
+        Button allow_btn = (Button) dialog.findViewById(R.id.dia_allow);
+        Button disallow_btn = (Button) dialog.findViewById(R.id.dia_disallow);
+        final TextView noti_tv = (TextView) dialog.findViewById(R.id.dia_noti);
+
+        noti_tv.setText("");
+        allow_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final String sid = stu_id_text.getText().toString();
+                if(sid.length() == 0)
+                    return;
+
+                JsonObject up = new JsonObject();
+                up.addProperty("student_id", sid);
+
+                StringClient client = ServiceGenerator.createService(StringClient.class, GV.auCode);
+                Call<ResponseBody> call = client.allowTrainFace(up);
+                call.enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                        try {
+                            if (response.code() == 200) {
+                                noti_tv.setTextColor(Color.GREEN);
+                                noti_tv.setText("Student with ID \"" + sid + "\" is allowed to re-train face in 10 minutes");
+                                stu_id_text.setText("");
+
+                            } else if (response.code() == 400) {
+                                JSONObject data = new JSONObject(response.errorBody().string());
+                                int errorCode = data.getInt("code");
+                                noti_tv.setTextColor(Color.RED);
+                                noti_tv.setText("student ID does not exist!"); //TODO: specify error
+
+                            } else {
+                                noti_tv.setTextColor(Color.RED);
+                                noti_tv.setText("Unauthorization problem!"); //TODO: specify error
+                            }
+                        }
+                        catch (Exception e) {
+                            noti_tv.setTextColor(Color.RED);
+                            noti_tv.setText("Action failed! Please contact developer team");
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                        noti_tv.setTextColor(Color.RED);
+                        noti_tv.setText("Action failed! No internet access");
+                        ErrorClass.showError(TimeTableActivity.this, ErrorClass.internet_err);
+                    }
+                });
+            }
+        });
+
+        disallow_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final String sid = stu_id_text.getText().toString();
+                if(sid.length() == 0)
+                    return;
+
+                JsonObject up = new JsonObject();
+                up.addProperty("student_id", sid);
+
+                StringClient client = ServiceGenerator.createService(StringClient.class, GV.auCode);
+                Call<ResponseBody> call = client.disallowTrainFace(up);
+                call.enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                        try {
+                            if (response.code() == 200) {
+                                noti_tv.setTextColor(Color.GREEN);
+                                noti_tv.setText("Student with ID \"" + sid + "\" is disallowed from re-training face");
+                                stu_id_text.setText("");
+
+                            } else if (response.code() == 400) {
+                                JSONObject data = new JSONObject(response.errorBody().string());
+                                int errorCode = data.getInt("code");
+                                noti_tv.setTextColor(Color.RED);
+                                noti_tv.setText("student ID does not exist!"); //TODO: specify error
+
+                            } else {
+                                noti_tv.setTextColor(Color.RED);
+                                noti_tv.setText("Unauthorization problem!"); //TODO: specify error
+                            }
+                        }
+                        catch (Exception e) {
+                            noti_tv.setTextColor(Color.RED);
+                            noti_tv.setText("Action failed! Please contact developer team");
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                        noti_tv.setTextColor(Color.RED);
+                        noti_tv.setText("Action failed! No internet access");
+                        ErrorClass.showError(TimeTableActivity.this, ErrorClass.internet_err);
+                    }
+                });
+            }
+        });
+
+        cancel_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.cancel();
+            }
+        });
+
+        dialog.show();
+
+    }
+
+    void onGetDropdownListSuccess() {
+        ProgressDia.dismissDialog();
+    }
+    void onGetDropdownListFailed(int err) {
+        ProgressDia.dismissDialog();
+        ErrorClass.showError(activity, err);
+    }
+    void onGetStudentListSuccess() {
+        ProgressDia.dismissDialog();
+    }
+    void onGetStudentListFailed(int err) {
+        ProgressDia.dismissDialog();
+        ErrorClass.showError(activity, err);
+    }
 
 }

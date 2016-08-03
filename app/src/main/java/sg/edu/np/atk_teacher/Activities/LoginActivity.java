@@ -1,6 +1,5 @@
-package sg.edu.np.atk_teacher;
+package sg.edu.np.atk_teacher.Activities;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -19,11 +18,14 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import sg.edu.np.atk_teacher.AuxiliaryClasses.ProgressDia;
+import sg.edu.np.atk_teacher.BaseClasses.ErrorClass;
 import sg.edu.np.atk_teacher.BaseClasses.GF;
 import sg.edu.np.atk_teacher.BaseClasses.GV;
 import sg.edu.np.atk_teacher.BaseClasses.ServiceGenerator;
 import sg.edu.np.atk_teacher.BaseClasses.StringClient;
-import sg.edu.np.atk_teacher.UtilityClasses.LoginClass;
+import sg.edu.np.atk_teacher.R;
+import sg.edu.np.atk_teacher.RequestClasses.LoginClass;
 
 /**
  * Created by Lord One on 7/21/2016.
@@ -50,6 +52,7 @@ public class LoginActivity extends AppCompatActivity {
 
         GV.activity = LoginActivity.this;
 
+//        login();
         _loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -85,9 +88,10 @@ public class LoginActivity extends AppCompatActivity {
 
     public void login() {
 
-        //TODO: validate before login
+        ProgressDia.showDialog(this);
+
 //        if (!validate()) {
-//            onLoginFailed();
+//            onLoginFailed(ErrorClass.accInvalid_err);
 //            return;
 //        }
 
@@ -96,8 +100,8 @@ public class LoginActivity extends AppCompatActivity {
         String username = _usernameText.getText().toString();
         String password = _passwordText.getText().toString();
 
-        username = "abab";
-        password = "123456";
+        username = "kkkk";
+        password = "kkkkkk";
 
         StringClient client = ServiceGenerator.createService(StringClient.class);
 
@@ -120,30 +124,28 @@ public class LoginActivity extends AppCompatActivity {
                     else if(messageCode == 400) {
                         JSONObject data = new JSONObject(response.errorBody().string());
                         int errorCode = data.getInt("code");
-                        onLoginFailed(0);
-//                        Notification.showLoginNoti(activity, errorCode);
+                        onLoginFailed(ErrorClass.accInvalid_err);
                     }
                     else {
-//                        ErrorClass.showError(LogInActivity.this, 1);
+                        onLoginFailed(ErrorClass.unauthorized_err);
                     }
                 } catch (Exception e) {
-                    onLoginFailed(0);
+                    onLoginFailed(ErrorClass.wrongFormat_err);
                     e.printStackTrace();
-//                    ErrorClass.showError(LogInActivity.this, 2);
                 }
             }
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
                 System.out.print("Error Login");
-                onLoginFailed(1);
-//                ErrorClass.showError(LogInActivity.this, 3);
+                onLoginFailed(ErrorClass.internet_err);
             }
         });
 
     }
 
     private void onLoginSuccess() {
+        ProgressDia.dismissDialog();
         _loginButton.setEnabled(true);
         Intent intent = new Intent(LoginActivity.this, TimeTableActivity.class);
         startActivity(intent);
@@ -151,10 +153,8 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void onLoginFailed(int errorCode) {
-        if(errorCode == 0)
-            Toast.makeText(getBaseContext(), "Login failed, code != 200", Toast.LENGTH_LONG).show();
-        if(errorCode == 1)
-            Toast.makeText(getBaseContext(), "Login failed, no internet", Toast.LENGTH_LONG).show();
+        ProgressDia.dismissDialog();
+        ErrorClass.showError(this, errorCode);
         _loginButton.setEnabled(true);
     }
 
@@ -165,14 +165,14 @@ public class LoginActivity extends AppCompatActivity {
         String password = _passwordText.getText().toString();
 
         if (username.isEmpty() || username.length() < 4 || username.length() > 255) {
-            _usernameText.setError("enter a valid username address");
+            _usernameText.setError("enter a valid username");
             valid = false;
         } else {
             _usernameText.setError(null);
         }
 
         if (password.isEmpty() || password.length() < 6 || password.length() > 255) {
-            _passwordText.setError("at least 6 characters");
+            _passwordText.setError("between 6 and 255 characters");
             valid = false;
         } else {
             _passwordText.setError(null);

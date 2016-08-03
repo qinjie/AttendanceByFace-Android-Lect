@@ -1,4 +1,4 @@
-package sg.edu.np.atk_teacher.UtilityClasses;
+package sg.edu.np.atk_teacher.RequestClasses;
 
 /**
  * Created by Champ on 29/07/2016.

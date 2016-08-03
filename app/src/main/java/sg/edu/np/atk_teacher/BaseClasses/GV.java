@@ -12,6 +12,9 @@ public class GV {
             attend_code = 1,
             late_code = 2,
             absent_code = 3; //need to be consistent with the local server
+
+    public static final int max_late_time = 15; //need to be consistent with the local server
+
     public static final String [] status_name = {"Present", "Late", "Absent"};
 
     public static Activity activity;

@@ -23,8 +23,8 @@
             android:singleLine="true"
             android:layout_marginTop="5dip"
             android:layout_above="@+id/subject_text"
-            android:textSize="18dp"
-            android:textColor="#030303">
+            android:textSize="18sp"
+            android:textStyle="bold">
         </TextView>
 
         <TextView android:text="Discrete Math"
@@ -32,18 +32,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_above="@+id/timeanddate_text"
-            android:textSize="18dp"
-            android:textColor="#030303">
+            android:textSize="18sp">
         </TextView>
 
         <TextView android:text="1:00 - 2:00, 7/14/2016"
             android:id="@+id/timeanddate_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="18dp"
+            android:textSize="18sp"
             android:layout_marginBottom="7dip"
-            android:layout_alignParentBottom="true"
-            android:textColor="#030303">
+            android:layout_alignParentBottom="true">
         </TextView>
 
         <RelativeLayout
@@ -75,7 +73,7 @@
                 android:id="@+id/all_taken_text"
                 android:layout_centerInParent="true"
                 android:gravity="center"
-                android:textSize="27dp"/>
+                android:textSize="27sp"/>
 
 
         </RelativeLayout>

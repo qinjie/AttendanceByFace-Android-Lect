@@ -71,9 +71,9 @@ public class Timetable_Array_Adapter extends ArrayAdapter<Item_timetable> {
 
 
             if(t1!=null)
-                t1.setText(o.getLesson_id());
+                t1.setText(o.getClass_section());
             if(t2!=null)
-                t2.setText(o.getSubject_name());
+                t2.setText(o.getLocation());
             if(t3!=null)
                 t3.setText(o.getTimeAndDate());
             if(t4!=null)

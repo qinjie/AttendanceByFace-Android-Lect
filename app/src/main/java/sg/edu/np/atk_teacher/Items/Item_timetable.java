@@ -4,7 +4,7 @@ package sg.edu.np.atk_teacher.Items;
  * Created by Lord One on 7/20/2016.
  */
 public class Item_timetable {
-    private String subject_name;
+    private String class_section;
     private String lesson_id;
     private int start_hour;
     private int start_minute;
@@ -13,11 +13,12 @@ public class Item_timetable {
     private String date;
     private int n_students_taken;
     private int n_students;
+    private String location;
 
 
-    public Item_timetable(String subject_name, String lesson_id, int start_hour, int start_minute,
-                     int end_hour, int end_minute, String date, int n_students_taken, int n_students) {
-        this.subject_name = subject_name;
+    public Item_timetable(String class_section, String lesson_id, int start_hour, int start_minute,
+                     int end_hour, int end_minute, String date, int n_students_taken, int n_students, String location) {
+        this.class_section = class_section;
         this.lesson_id = lesson_id;
         this.start_hour = start_hour;
         this.start_minute = start_minute;
@@ -26,10 +27,11 @@ public class Item_timetable {
         this.date = date;
         this.n_students_taken = n_students_taken;
         this.n_students = n_students;
+        this.location = location;
     }
 
-    public String getSubject_name() {
-        return subject_name;
+    public String getClass_section() {
+        return class_section;
     }
 
     public String getLesson_id() {
@@ -67,6 +69,14 @@ public class Item_timetable {
     public String getTimeAndDate() {
         return String.format("%02d", start_hour) + ":" + String.format("%02d", start_minute) +
                 " - " + String.format("%02d", end_hour) + ":" + String.format("%02d", end_minute) + ", " + date;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void add_to_n_students_taken(int n) {
+        n_students_taken += n;
     }
 
     public int compareTo(Item_timetable o) {

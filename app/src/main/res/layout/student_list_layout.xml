@@ -3,7 +3,8 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:weightSum="1"
-    android:gravity="bottom">
+    android:gravity="bottom"
+    android:background="#FFFFFF">
 
     <TextView
         android:layout_width="wrap_content"
@@ -19,7 +20,7 @@
         android:layout_centerHorizontal="true"/>
 
     <ListView
-        android:id="@android:id/list"
+        android:id="@+id/list_stu"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/description_browser"

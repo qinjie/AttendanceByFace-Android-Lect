@@ -75,12 +75,25 @@ public class Item_student implements Comparable<Item_student>{
         this.history_n_absent = history_n_absent;
     }
 
-    public void modifyHistory(int status, int ntimes) {
-        if(status == GV.attend_code)
-            history_n_attend += ntimes;
-        if(status == GV.late_code)
-            history_n_late += ntimes;
-        if(status == GV.absent_code)
-            history_n_absent += ntimes;
+    public int modifyHistory(int oldstt, int newstt) {
+        if(oldstt == GV.attend_code)
+            history_n_attend -= 1;
+        if(oldstt == GV.late_code)
+            history_n_late -= 1;
+        if(oldstt == GV.absent_code)
+            history_n_absent -= 1;
+
+        if(newstt == GV.attend_code)
+            history_n_attend += 1;
+        if(newstt == GV.late_code)
+            history_n_late += 1;
+        if(newstt == GV.absent_code)
+            history_n_absent += 1;
+
+        if((oldstt == GV.absent_code || oldstt == GV.notyet_code) && (newstt == GV.attend_code || newstt == GV.late_code))
+            return 1;
+        if((oldstt == GV.attend_code || oldstt == GV.late_code) && (newstt == GV.absent_code || newstt == GV.notyet_code))
+            return -1;
+        return 0;
     }
 }
