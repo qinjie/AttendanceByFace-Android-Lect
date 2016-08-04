@@ -2,8 +2,11 @@ package sg.edu.np.atk_teacher.Activities;
 
 import android.app.Activity;
 import android.app.DatePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.view.ContextThemeWrapper;
 import android.view.View;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -12,10 +15,12 @@ import android.view.MenuItem;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -46,30 +51,34 @@ public class TimeTableActivity extends NavActivity {
     ListView listView;
     private int preLast;
     private Date preDate = new Date();
-    private Spinner spinner;
+    private ImageButton spinner;
     private ImageButton date_picker;
-    private final String ALL_SUBJECT = "All Subjects";
+    private final String ALL_SUBJECT = "Subjects";
     private String curr_subject = ALL_SUBJECT;
     private String curr_date;
+    private String past_date;
+    private String request_date;
+    private TextView date_tv;
     private int chosenPosition;
+    private TextView curr_subject_tv;
     private Activity activity;
     final List<Item_timetable> timetable_list = new ArrayList<>();
     ArrayList<String> options = new ArrayList<String>();
-    ArrayAdapter<String> options_adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getLayoutInflater().inflate(R.layout.content_timetable, frameLayout);
 
-        options_adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, options);
-
         initDate();
         activity = this;
         date_picker = (ImageButton) findViewById(R.id.datePickerButt);
-        spinner = (Spinner) findViewById(R.id.spinner);
+        spinner = (ImageButton) findViewById(R.id.spinner);
+        curr_subject_tv = (TextView) findViewById(R.id.subject_chosen_tv);
+        date_tv = (TextView) findViewById(R.id.date_tv);
 
         getDropdownList();
+        getTimetableList(true);
 
         adapter = new Timetable_Array_Adapter(TimeTableActivity.this, R.layout.item_timetable_view, timetable_list);
 
@@ -128,18 +137,37 @@ public class TimeTableActivity extends NavActivity {
         });
 
 
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        spinner.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                    curr_subject = options_adapter.getItem(position);
-                    getTimetableList(true);
+            public void onClick(View v) {
+                if(options == null || options.size() == 0)
+                    return;
+
+                CharSequence[] cs = options.toArray(new CharSequence[options.size()]);
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(TimeTableActivity.this);
+                builder.setTitle("Select subject");
+                builder.setIcon(R.drawable.dark_green_round_with_stroke);
+
+                builder.setItems(cs, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int item) {
+                        Toast.makeText(getApplicationContext(), options.get(item), Toast.LENGTH_SHORT).show();
+                        curr_subject = options.get(item);
+                        curr_subject_tv.setText(curr_subject);
+                        getTimetableList(true);
+                    }
+                });
+
+                final AlertDialog alert = builder.create();
+
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        alert.show();
+                    }
+                });
+
             }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parentView) {
-
-            }
-
         });
 
 
@@ -242,8 +270,6 @@ public class TimeTableActivity extends NavActivity {
                         List<String> data = new ArrayList<String>(Arrays.asList(_data.split(",")));
                         options.add(ALL_SUBJECT);
                         options.addAll(data);
-                        options_adapter.setDropDownViewResource(R.layout.spinner_layout);
-                        spinner.setAdapter(options_adapter);
 
                         onGetDropdownListSuccess();
                     }
@@ -265,8 +291,13 @@ public class TimeTableActivity extends NavActivity {
 
     void getTimetableList(final boolean toReset) {
         ProgressDia.showDialog(this);
-        if(toReset)
+        if(toReset) {
             timetable_list.clear();
+            date_tv.setText(curr_date);
+            request_date = curr_date;
+        }
+        else
+            request_date = past_date;
 
         StringClient client = ServiceGenerator.createService(StringClient.class, GV.auCode);
 
@@ -275,7 +306,7 @@ public class TimeTableActivity extends NavActivity {
             classSection = "all";
         else
             classSection = curr_subject;
-        Call<ResponseBody> call = client.getListClasses(curr_date, classSection);
+        Call<ResponseBody> call = client.getListClasses(request_date, classSection);
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -283,7 +314,7 @@ public class TimeTableActivity extends NavActivity {
                     try {
                         JSONObject body = new JSONObject(response.body().string());
                         JSONArray timetable = body.getJSONArray("timetable");
-                        curr_date = body.getString("nextFromDate");
+                        past_date = body.getString("nextFromDate");
 
                         if(timetable.length() > 0) {
                             for (int i = 0; i < timetable.length(); i++) {
