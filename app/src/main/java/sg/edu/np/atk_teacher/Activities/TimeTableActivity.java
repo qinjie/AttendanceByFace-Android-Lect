@@ -171,16 +171,16 @@ public class TimeTableActivity extends NavActivity {
         });
 
 
-        date_picker.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Calendar c = Calendar.getInstance();
-                int year = c.get(Calendar.YEAR);
-                int month = c.get(Calendar.MONTH);
-                int day = c.get(Calendar.DAY_OF_MONTH);
-                new DatePickerDialog(activity, datePickerListener, year, month, day).show();
-            }
-        });
+//        date_picker.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Calendar c = Calendar.getInstance();
+//                int year = c.get(Calendar.YEAR);
+//                int month = c.get(Calendar.MONTH);
+//                int day = c.get(Calendar.DAY_OF_MONTH);
+//                new DatePickerDialog(activity, datePickerListener, year, month, day).show();
+//            }
+//        });
 
     }
 
@@ -355,6 +355,14 @@ public class TimeTableActivity extends NavActivity {
             }
         });
 
+    }
+
+    public void dateClick(View v) {
+        Calendar c = Calendar.getInstance();
+        int year = c.get(Calendar.YEAR);
+        int month = c.get(Calendar.MONTH);
+        int day = c.get(Calendar.DAY_OF_MONTH);
+        new DatePickerDialog(activity, datePickerListener, year, month, day).show();
     }
 
     void onGetDropdownListSuccess() {

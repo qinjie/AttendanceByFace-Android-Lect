@@ -59,7 +59,8 @@
                 android:layout_marginLeft="30dp"
                 android:gravity="center"
                 android:layout_gravity="center_vertical"
-                android:textSize="20sp" />
+                android:textSize="20sp"
+                android:onClick="dateClick" />
 
             <ImageButton
                 android:layout_width="wrap_content"
@@ -67,7 +68,8 @@
                 android:id="@+id/datePickerButt"
                 android:src="@mipmap/calendar2"
                 android:background="?android:selectableItemBackground"
-                android:layout_marginLeft="5dp" />
+                android:layout_marginLeft="5dp"
+                android:onClick="dateClick" />
 
         </LinearLayout>
 

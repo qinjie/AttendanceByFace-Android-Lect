@@ -52,7 +52,7 @@ public class LoginActivity extends AppCompatActivity {
 
         GV.activity = LoginActivity.this;
 
-        login();
+//        login();
         _loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -90,10 +90,10 @@ public class LoginActivity extends AppCompatActivity {
 
         ProgressDia.showDialog(this);
 
-//        if (!validate()) {
-//            onLoginFailed(ErrorClass.accInvalid_err);
-//            return;
-//        }
+        if (!validate()) {
+            onLoginFailed(ErrorClass.accInvalid_err);
+            return;
+        }
 
         _loginButton.setEnabled(false);
 
