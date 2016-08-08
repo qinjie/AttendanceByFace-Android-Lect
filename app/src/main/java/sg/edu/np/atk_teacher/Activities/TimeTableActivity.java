@@ -77,6 +77,8 @@ public class TimeTableActivity extends NavActivity {
         curr_subject_tv = (TextView) findViewById(R.id.subject_chosen_tv);
         date_tv = (TextView) findViewById(R.id.date_tv);
 
+        setLecturerName();
+
         getDropdownList();
         getTimetableList(true);
 

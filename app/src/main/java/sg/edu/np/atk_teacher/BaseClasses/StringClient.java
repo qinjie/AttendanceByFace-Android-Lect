@@ -12,6 +12,7 @@ import sg.edu.np.atk_teacher.RequestClasses.LoginClass;
 import sg.edu.np.atk_teacher.RequestClasses.ModifyStatusClass;
 import sg.edu.np.atk_teacher.RequestClasses.ResetPassClass;
 import sg.edu.np.atk_teacher.RequestClasses.SignupClass;
+import sg.edu.np.atk_teacher.RequestClasses.TrainFaceClass;
 
 /**
  * Created by Lord One on 7/26/2016.
@@ -51,7 +52,7 @@ public interface StringClient {
     Call<ResponseBody> postResetPassword(@Body ResetPassClass up);
 
     @POST("user/allow-train-face")
-    Call<ResponseBody> allowTrainFace(@Body JsonObject up);
+    Call<ResponseBody> allowTrainFace(@Body TrainFaceClass up);
 
     @POST("user/disallow-train-face")
     Call<ResponseBody> disallowTrainFace(@Body JsonObject up);

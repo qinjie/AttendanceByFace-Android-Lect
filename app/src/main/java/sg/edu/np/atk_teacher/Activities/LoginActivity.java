@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -40,6 +41,7 @@ public class LoginActivity extends AppCompatActivity {
     @InjectView(R.id.btn_login)                     Button _loginButton;
     @InjectView(R.id.link_forgotPass)               TextView _forgotPassLink;
     @InjectView(R.id.link_signup)                   TextView _signupLink;
+    @InjectView(R.id.checkBox)                      CheckBox _checkBox;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +54,14 @@ public class LoginActivity extends AppCompatActivity {
 
         GV.activity = LoginActivity.this;
 
+        String savedUsername = GF.getSavedUsername(this);
+        _usernameText.setText(savedUsername);
+        if(savedUsername.length() == 0)
+            _checkBox.setChecked(false);
+        else
+            _checkBox.setChecked(true);
 //        login();
+
         _loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -97,7 +106,7 @@ public class LoginActivity extends AppCompatActivity {
 
         _loginButton.setEnabled(false);
 
-        String username = _usernameText.getText().toString();
+        final String username = _usernameText.getText().toString();
         String password = _passwordText.getText().toString();
 
 //        username = "abab";
@@ -117,9 +126,13 @@ public class LoginActivity extends AppCompatActivity {
 
                     if (messageCode == 200) {
                         JSONObject data = new JSONObject(response.body().string());
+                        String lecturerName = data.getString("name");
                         String authorizationCode = data.getString("token");
-                        GF.setAuCodeInSP(LoginActivity.this, authorizationCode);
-                        onLoginSuccess();
+                        if(_checkBox.isChecked())
+                            GF.setAuCodeInSP(LoginActivity.this, authorizationCode, username);
+                        else
+                            GF.setAuCodeInSP(LoginActivity.this, authorizationCode, "");
+                        onLoginSuccess(lecturerName);
                     }
                     else if(messageCode == 400) {
                         JSONObject data = new JSONObject(response.errorBody().string());
@@ -144,10 +157,11 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
-    private void onLoginSuccess() {
+    private void onLoginSuccess(String lecturerName) {
         ProgressDia.dismissDialog();
         _loginButton.setEnabled(true);
         Intent intent = new Intent(LoginActivity.this, TimeTableActivity.class);
+        intent.putExtra("lecturerName", lecturerName);
         startActivity(intent);
         finish();
     }
@@ -179,6 +193,11 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         return valid;
+    }
+
+    void setLecturerName(String lecturerName) {
+        TextView _teacherName_text = (TextView) findViewById(R.id.teacher_name);
+        _teacherName_text.setText(lecturerName);
     }
 
 }

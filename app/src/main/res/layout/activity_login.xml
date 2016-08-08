@@ -62,6 +62,13 @@
                 android:padding="12dp"
                 android:text="Login"/>
 
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="save username"
+                android:id="@+id/checkBox"
+                android:checked="false" />
+
             <TextView android:id="@+id/link_forgotPass"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"

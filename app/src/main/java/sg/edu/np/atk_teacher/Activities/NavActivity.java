@@ -32,6 +32,7 @@ import sg.edu.np.atk_teacher.BaseClasses.GV;
 import sg.edu.np.atk_teacher.BaseClasses.ServiceGenerator;
 import sg.edu.np.atk_teacher.BaseClasses.StringClient;
 import sg.edu.np.atk_teacher.R;
+import sg.edu.np.atk_teacher.RequestClasses.TrainFaceClass;
 
 public class NavActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -42,7 +43,7 @@ public class NavActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nav);
-        frameLayout = (FrameLayout)findViewById(R.id.content_frame);
+        frameLayout = (FrameLayout) findViewById(R.id.content_frame);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -89,14 +90,14 @@ public class NavActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if(id == R.id.nav_current_classes) {
+        if (id == R.id.nav_current_classes) {
             Intent intent = new Intent(this, TimeTableActivity.class);
             startActivity(intent);
-        } else if(id == R.id.nav_timetable_this_week) {
+        } else if (id == R.id.nav_timetable_this_week) {
             Intent intent = new Intent(this, TimetableThisWeekActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_allow_train_face) {
-            allowTrainFace();
+            GF.allowTrainFace(this);
         } else if (id == R.id.nav_change_password) {
             Intent intent = new Intent(this, ChangePasswordActivity.class);
             startActivityForResult(intent, REQUEST_CHANGEPASSWORD);
@@ -109,127 +110,14 @@ public class NavActivity extends AppCompatActivity
         return true;
     }
 
-
-
-    void allowTrainFace() {
-
-        final Dialog dialog = new Dialog(this);
-        dialog.setTitle("Allow train face");
-        dialog.setContentView(R.layout.train_face_dialog);
-
-        final EditText stu_id_text = (EditText) dialog.findViewById(R.id.dia_input_sid);
-        Button cancel_btn = (Button) dialog.findViewById(R.id.dia_cancel);
-        Button allow_btn = (Button) dialog.findViewById(R.id.dia_allow);
-        Button disallow_btn = (Button) dialog.findViewById(R.id.dia_disallow);
-        final TextView noti_tv = (TextView) dialog.findViewById(R.id.dia_noti);
-
-        noti_tv.setText("");
-        allow_btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final String sid = stu_id_text.getText().toString();
-                if(sid.length() == 0)
-                    return;
-
-                JsonObject up = new JsonObject();
-                up.addProperty("student_id", sid);
-
-                StringClient client = ServiceGenerator.createService(StringClient.class, GV.auCode);
-                Call<ResponseBody> call = client.allowTrainFace(up);
-                call.enqueue(new Callback<ResponseBody>() {
-                    @Override
-                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                        try {
-                            if (response.code() == 200) {
-                                noti_tv.setTextColor(Color.GREEN);
-                                noti_tv.setText("Student with ID \"" + sid + "\" is allowed to re-train face in 10 minutes");
-                                stu_id_text.setText("");
-
-                            } else if (response.code() == 400) {
-                                JSONObject data = new JSONObject(response.errorBody().string());
-                                int errorCode = data.getInt("code");
-                                noti_tv.setTextColor(Color.RED);
-                                noti_tv.setText("student ID does not exist!"); //TODO: specify error
-
-                            } else {
-                                noti_tv.setTextColor(Color.RED);
-                                noti_tv.setText("Unauthorization problem!"); //TODO: specify error
-                            }
-                        }
-                        catch (Exception e) {
-                            noti_tv.setTextColor(Color.RED);
-                            noti_tv.setText("Action failed! Please contact developer team");
-                            e.printStackTrace();
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<ResponseBody> call, Throwable t) {
-                        noti_tv.setTextColor(Color.RED);
-                        noti_tv.setText("Action failed! No internet access");
-                        ErrorClass.showError(NavActivity.this, ErrorClass.internet_err);
-                    }
-                });
-            }
-        });
-
-        disallow_btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final String sid = stu_id_text.getText().toString();
-                if(sid.length() == 0)
-                    return;
-
-                JsonObject up = new JsonObject();
-                up.addProperty("student_id", sid);
-
-                StringClient client = ServiceGenerator.createService(StringClient.class, GV.auCode);
-                Call<ResponseBody> call = client.disallowTrainFace(up);
-                call.enqueue(new Callback<ResponseBody>() {
-                    @Override
-                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                        try {
-                            if (response.code() == 200) {
-                                noti_tv.setTextColor(Color.GREEN);
-                                noti_tv.setText("Student with ID \"" + sid + "\" is disallowed from re-training face");
-                                stu_id_text.setText("");
-
-                            } else if (response.code() == 400) {
-                                JSONObject data = new JSONObject(response.errorBody().string());
-                                int errorCode = data.getInt("code");
-                                noti_tv.setTextColor(Color.RED);
-                                noti_tv.setText("student ID does not exist!"); //TODO: specify error
-
-                            } else {
-                                noti_tv.setTextColor(Color.RED);
-                                noti_tv.setText("Unauthorization problem!"); //TODO: specify error
-                            }
-                        }
-                        catch (Exception e) {
-                            noti_tv.setTextColor(Color.RED);
-                            noti_tv.setText("Action failed! Please contact developer team");
-                            e.printStackTrace();
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<ResponseBody> call, Throwable t) {
-                        noti_tv.setTextColor(Color.RED);
-                        noti_tv.setText("Action failed! No internet access");
-                        ErrorClass.showError(NavActivity.this, ErrorClass.internet_err);
-                    }
-                });
-            }
-        });
-
-        cancel_btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.cancel();
-            }
-        });
-
-        dialog.show();
-
+    void setLecturerName() {
+        if(getIntent().hasExtra("lecturerName")) {
+            String lecturerName = getIntent().getStringExtra("lecturerName");
+            NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+            View hView =  navigationView.getHeaderView(0);
+            TextView nav_user = (TextView)hView.findViewById(R.id.teacher_name);
+            nav_user.setText(lecturerName);
+        }
     }
+
 }
