@@ -100,8 +100,8 @@ public class LoginActivity extends AppCompatActivity {
         String username = _usernameText.getText().toString();
         String password = _passwordText.getText().toString();
 
-        username = "abab";
-        password = "123456";
+//        username = "abab";
+//        password = "123456";
 
         StringClient client = ServiceGenerator.createService(StringClient.class);
 

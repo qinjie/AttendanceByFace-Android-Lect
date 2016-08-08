@@ -60,7 +60,7 @@ public class ChangePasswordActivity extends NavActivity {
         confirmedPassword = _confirmedPasswordText.getText().toString();
 
         if (!validate()) {
-            onChangePasswordFailed(ErrorClass.accInvalid_err);
+            onChangePasswordFailed(ErrorClass.unsuccessAttemp_err);
             return;
         }
 
@@ -103,13 +103,6 @@ public class ChangePasswordActivity extends NavActivity {
 
         if (newPassword.isEmpty() || newPassword.length() < 6 || newPassword.length() > 255) {
             _newPasswordText.setError("between 6 and 255 alphanumeric characters");
-            valid = false;
-        } else {
-            _newPasswordText.setError(null);
-        }
-
-        if (newPassword.compareTo(currentPassword) == 0) {
-            _newPasswordText.setError("new password must be different with current password");
             valid = false;
         } else {
             _newPasswordText.setError(null);
