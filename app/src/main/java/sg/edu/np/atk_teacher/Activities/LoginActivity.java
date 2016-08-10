@@ -60,7 +60,7 @@ public class LoginActivity extends AppCompatActivity {
             _checkBox.setChecked(false);
         else
             _checkBox.setChecked(true);
-        login();
+//        login();
 
         _loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -99,18 +99,18 @@ public class LoginActivity extends AppCompatActivity {
 
         ProgressDia.showDialog(this);
 
-//        if (!validate()) {
-//            onLoginFailed(ErrorClass.accInvalid_err);
-//            return;
-//        }
+        if (!validate()) {
+            onLoginFailed(ErrorClass.accInvalid_err);
+            return;
+        }
 
         _loginButton.setEnabled(false);
 
-//        final String username = _usernameText.getText().toString();
-//        String password = _passwordText.getText().toString();
+        final String username = _usernameText.getText().toString();
+        String password = _passwordText.getText().toString();
 
-        final String username = "pppp";
-        final String password = "pppppp";
+//        final String username = "pppp";
+//        final String password = "pppppp";
 
         StringClient client = ServiceGenerator.createService(StringClient.class);
 
