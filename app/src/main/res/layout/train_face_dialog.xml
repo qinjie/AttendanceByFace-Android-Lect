@@ -22,7 +22,7 @@
         <EditText android:id="@+id/dia_input_sid"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="student ID" />
+            android:hint="Example: 12345678B" />
     </android.support.design.widget.TextInputLayout>
 
     <TextView
@@ -48,14 +48,14 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Disallow"
+            android:text="Disable"
             android:id="@+id/dia_disallow"
             android:layout_weight="1" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Allow"
+            android:text="Enable"
             android:id="@+id/dia_allow"
             android:layout_weight="1" />
     </TableRow>

@@ -14,6 +14,10 @@ import com.google.gson.JsonObject;
 
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -31,7 +35,7 @@ public class GF {
     public static boolean alreadyLoggedIn (Activity activity) {
         SharedPreferences pref = activity.getSharedPreferences("ATK_lec_pref", 0);
         String auCode = pref.getString("authorizationCode", null);
-        if (auCode != null && auCode != "{\"password\":[\"Incorrect username or password.\"]}"){
+        if (auCode != null && auCode != "{\"password\":[\"Incorrect username or password.\"]}") {
             return true;
         }
         return false;
@@ -80,7 +84,7 @@ public class GF {
     public static void allowTrainFace(final Activity activity) {
 
         final Dialog dialog = new Dialog(activity);
-        dialog.setTitle("Allow train face");
+        dialog.setTitle("Enable Face Training");
         dialog.setContentView(R.layout.train_face_dialog);
 
         final EditText stu_id_text = (EditText) dialog.findViewById(R.id.dia_input_sid);
@@ -198,6 +202,26 @@ public class GF {
 
         dialog.show();
 
+    }
+
+    public static String beautifyDate(String _date) {
+        String result = _date;
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            Date date = format.parse(_date);
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(date);
+
+            int year = cal.get(Calendar.YEAR);
+            String month = GV.MONTH_NAME[cal.get(Calendar.MONTH)];
+            int day = cal.get(Calendar.DAY_OF_MONTH);
+
+            result = year + "-" + month + "-" + String.format("%02d", day);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 
 }

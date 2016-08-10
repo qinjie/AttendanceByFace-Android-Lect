@@ -38,11 +38,13 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import sg.edu.np.atk_teacher.AuxiliaryClasses.ProgressDia;
 import sg.edu.np.atk_teacher.BaseClasses.ErrorClass;
+import sg.edu.np.atk_teacher.BaseClasses.GF;
 import sg.edu.np.atk_teacher.BaseClasses.GV;
 import sg.edu.np.atk_teacher.BaseClasses.ServiceGenerator;
 import sg.edu.np.atk_teacher.BaseClasses.StringClient;
 import sg.edu.np.atk_teacher.Items.Item_timetable;
 import sg.edu.np.atk_teacher.ArrayAdapters.Timetable_Array_Adapter;
+import sg.edu.np.atk_teacher.Items.Item_timetable_seperator;
 import sg.edu.np.atk_teacher.R;
 
 public class TimeTableActivity extends NavActivity {
@@ -62,7 +64,7 @@ public class TimeTableActivity extends NavActivity {
     private int chosenPosition;
     private TextView curr_subject_tv;
     private Activity activity;
-    final List<Item_timetable> timetable_list = new ArrayList<>();
+    final List timetable_list = new ArrayList<>();
     ArrayList<String> options = new ArrayList<String>();
 
     @Override
@@ -79,10 +81,10 @@ public class TimeTableActivity extends NavActivity {
 
         setLecturerName();
 
+        adapter = new Timetable_Array_Adapter(TimeTableActivity.this, R.layout.item_timetable_view, R.layout.timetable_separator, timetable_list);
+
         getDropdownList();
         getTimetableList(true);
-
-        adapter = new Timetable_Array_Adapter(TimeTableActivity.this, R.layout.item_timetable_view, timetable_list);
 
         listView = (ListView) findViewById(android.R.id.list);
 
@@ -117,7 +119,7 @@ public class TimeTableActivity extends NavActivity {
 
                 Date currDate = new Date();
                 long sepTime = currDate.getTime() - preDate.getTime();
-                if(sepTime > 1000) {
+                if(sepTime > 1000 && adapter.getItemViewType(position) == Timetable_Array_Adapter.TYPE_ITEM) {
                     preDate = currDate;
 
                     chosenPosition = position;
@@ -172,18 +174,6 @@ public class TimeTableActivity extends NavActivity {
             }
         });
 
-
-//        date_picker.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Calendar c = Calendar.getInstance();
-//                int year = c.get(Calendar.YEAR);
-//                int month = c.get(Calendar.MONTH);
-//                int day = c.get(Calendar.DAY_OF_MONTH);
-//                new DatePickerDialog(activity, datePickerListener, year, month, day).show();
-//            }
-//        });
-
     }
 
     private DatePickerDialog.OnDateSetListener datePickerListener = new DatePickerDialog.OnDateSetListener() {
@@ -206,7 +196,7 @@ public class TimeTableActivity extends NavActivity {
     @Override
     public void onActivityResult(int request_code, int result_code, Intent data) {
         if(request_code == 0 && result_code != 0) {
-            Item_timetable tmp_timetable = timetable_list.get(chosenPosition);
+            Item_timetable tmp_timetable = (Item_timetable) timetable_list.get(chosenPosition);
             tmp_timetable.add_to_n_students_taken(result_code);
             timetable_list.set(chosenPosition, tmp_timetable);
             adapter.notifyDataSetChanged();
@@ -295,8 +285,9 @@ public class TimeTableActivity extends NavActivity {
         ProgressDia.showDialog(this);
         if(toReset) {
             timetable_list.clear();
-            date_tv.setText(curr_date);
+            date_tv.setText(GF.beautifyDate(curr_date));
             request_date = curr_date;
+            adapter.clearSpIdx();
         }
         else
             request_date = past_date;
@@ -316,19 +307,19 @@ public class TimeTableActivity extends NavActivity {
                     try {
                         JSONObject body = new JSONObject(response.body().string());
                         JSONArray timetable = body.getJSONArray("timetable");
+                        JSONObject [] data = new JSONObject[timetable.length()];
                         past_date = body.getString("nextFromDate");
 
                         if(timetable.length() > 0) {
                             for (int i = 0; i < timetable.length(); i++) {
-                                JSONObject data = timetable.getJSONObject(i);
-                                int start_hour = Integer.valueOf(data.getString("start_time").substring(0, 2));
-                                int start_minute = Integer.valueOf(data.getString("start_time").substring(3, 5));
-                                int end_hour = Integer.valueOf(data.getString("end_time").substring(0, 2));
-                                int end_minute = Integer.valueOf(data.getString("start_time").substring(3, 5));
-                                Item_timetable item = new Item_timetable(data.getString("class_section"), data.getString("lesson_id"),
-                                        start_hour, start_minute, end_hour, end_minute,
-                                        data.getString("date"), data.getInt("presentStudent"), data.getInt("totalStudent"),
-                                        data.getString("location"));
+                                data[i] = timetable.getJSONObject(i);
+                                if(i == 0 || isOnDifferentDate(data[i - 1], data[i])) {
+                                    Item_timetable_seperator item = new Item_timetable_seperator(data[i]);
+                                    adapter.addSeparatorIdx(timetable_list.size());
+                                    timetable_list.add(item);
+                                }
+
+                                Item_timetable item = new Item_timetable(data[i]);
                                 timetable_list.add(item);
                             }
                             adapter.notifyDataSetChanged();
@@ -365,6 +356,20 @@ public class TimeTableActivity extends NavActivity {
         int month = c.get(Calendar.MONTH);
         int day = c.get(Calendar.DAY_OF_MONTH);
         new DatePickerDialog(activity, datePickerListener, year, month, day).show();
+    }
+
+    public boolean isOnDifferentDate(JSONObject d1, JSONObject d2) {
+        boolean result = false;
+        try{
+            String date1 = d1.getString("date");
+            String date2 = d2.getString("date");
+            if(date1.compareTo(date2) != 0)
+                result = true;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 
     void onGetDropdownListSuccess() {

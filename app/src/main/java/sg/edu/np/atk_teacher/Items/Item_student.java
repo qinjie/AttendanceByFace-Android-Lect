@@ -6,7 +6,7 @@ import sg.edu.np.atk_teacher.BaseClasses.GV;
  * Created by Lord One on 7/19/2016.
  */
 
-public class Item_student implements Comparable<Item_student>{
+public class Item_student implements Comparable<Item_student> {
     private String name;
     private String id;
     private int current_status;
@@ -24,6 +24,7 @@ public class Item_student implements Comparable<Item_student>{
         history_n_late = _history_n_late;
         history_n_absent = _history_n_absent;
     }
+
     public String getName()
     {
         return name;

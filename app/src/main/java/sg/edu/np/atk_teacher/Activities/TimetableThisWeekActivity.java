@@ -75,7 +75,7 @@ public class TimetableThisWeekActivity extends NavActivity {
 //                            tv_list.get(index).addView(getSeparateLine());
 
                             String class_time = specific_lesson.getString("start_time") + " - " + specific_lesson.getString("end_time");
-                            String description = specific_lesson.getString("class_section") + '\n' +
+                            String description = specific_lesson.getString("catalog_number") + ", " + specific_lesson.getString("class_section") + '\n' +
                                                  specific_lesson.getString("location");
 
                             LinearLayout new_class = new LinearLayout(TimetableThisWeekActivity.this);

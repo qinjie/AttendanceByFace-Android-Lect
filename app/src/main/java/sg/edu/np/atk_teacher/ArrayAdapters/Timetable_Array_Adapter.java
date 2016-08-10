@@ -11,8 +11,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
+import java.util.TreeSet;
 
 import sg.edu.np.atk_teacher.Items.Item_timetable;
+import sg.edu.np.atk_teacher.Items.Item_timetable_seperator;
 import sg.edu.np.atk_teacher.R;
 
 /**
@@ -20,32 +22,55 @@ import sg.edu.np.atk_teacher.R;
  */
 public class Timetable_Array_Adapter extends ArrayAdapter<Item_timetable> {
     private Context c;
-    private int id;
-    private List<Item_timetable> subjects;
+    private int id_item;
+    private int id_sp;
+    private List subjects;
+    private TreeSet<Integer> spIdx = null;
 
-    public Timetable_Array_Adapter(Context context, int textViewResourceId,
-                                    List<Item_timetable> objects) {
-        super(context, textViewResourceId, objects);
+    public static final int TYPE_ITEM = 0;
+    public static final int TYPE_SEPARATOR = 1;
+    public static final int TYPE_MAX_COUNT = TYPE_SEPARATOR + 1;
+
+    public Timetable_Array_Adapter(Context context, int itemViewResourceId, int spViewResourceId,
+                                    List objects) {
+        super(context, itemViewResourceId, objects);
         c = context;
-        id = textViewResourceId;
+        id_item = itemViewResourceId;
+        id_sp = spViewResourceId;
         subjects = objects;
+        spIdx = new TreeSet<>();
     }
     public Item_timetable getItem(int i)
     {
-        return subjects.get(i);
+        return (Item_timetable) subjects.get(i);
     }
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View v = convertView;
         if (v == null) {
             LayoutInflater vi = (LayoutInflater)c.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            v = vi.inflate(id, null);
+            if(getItemViewType(position) == TYPE_ITEM) {
+                v = vi.inflate(id_item, null);
+            }
+            else {
+                v = vi.inflate(id_sp, null);
+            }
         }
 
+        if(getItemViewType(position) == TYPE_ITEM)
+            v = inflateItem(v, position);
+        else
+            v = inflateSeparator(v, position);
+
+        return v;
                /* create a new view of my layout and inflate it in the row */
         //convertView = ( RelativeLayout ) inflater.inflate( resource, null );
 
-        final Item_timetable o = subjects.get(position);
+
+    }
+
+    public View inflateItem(View v, int position) {
+        final Item_timetable o = (Item_timetable) subjects.get(position);
         if (o != null) {
             TextView t1 = (TextView) v.findViewById(R.id.classid_text);
             TextView t2 = (TextView) v.findViewById(R.id.subject_text);
@@ -71,15 +96,45 @@ public class Timetable_Array_Adapter extends ArrayAdapter<Item_timetable> {
 
 
             if(t1!=null)
-                t1.setText(o.getClass_section());
+                t1.setText(o.getCatalog_number() + ", " + o.getClass_section());
             if(t2!=null)
-                t2.setText(o.getLocation());
+                t2.setText(o.getTime());
             if(t3!=null)
-                t3.setText(o.getTimeAndDate());
+                t3.setText(o.getLocation());
             if(t4!=null)
                 t4.setText(String.valueOf(o.getN_students_taken()) + '/' + String.valueOf(o.getN_students()));
 
         }
         return v;
     }
+
+    public View inflateSeparator(View v, int position) {
+        final Item_timetable_seperator o = (Item_timetable_seperator) subjects.get(position);
+        if(o != null) {
+            TextView t1 = (TextView) v.findViewById(R.id.separator_text);
+            if(t1 != null)
+                t1.setText(o.getDate());
+        }
+        return v;
+    }
+
+    public void addSeparatorIdx(int idx) {
+        spIdx.add(idx);
+    }
+
+    public void clearSpIdx() {
+        if(spIdx != null)
+            spIdx.clear();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return spIdx.contains(position) ? TYPE_SEPARATOR : TYPE_ITEM;
+    }
+
+    @Override
+    public int getViewTypeCount() {
+        return TYPE_MAX_COUNT;
+    }
+
 }

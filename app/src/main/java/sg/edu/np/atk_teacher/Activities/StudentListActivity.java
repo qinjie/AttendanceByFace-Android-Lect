@@ -358,8 +358,9 @@ public class StudentListActivity extends NavActivity {
                         for(int i = 0; i < body.length(); i++) {
                             JSONObject item = body.getJSONObject(i);
                             Item_student stu = new Item_student(item.getString("student_name"), item.getString("student_id"),
-                                                                item.getInt("status"), item.getInt("countPresent"),
-                                                                item.getInt("countLate"), item.getInt("countAbsent"));
+                                    item.getInt("status"), item.getInt("countPresent"),
+                                    item.getInt("countLate"), item.getInt("countAbsent"));
+
                             stu_list.add(stu);
                         }
                         adapter.notifyDataSetChanged();
