@@ -119,7 +119,8 @@
             android:id="@+id/timePicker"
             android:layout_toRightOf="@id/radio_status"
             android:layout_alignParentRight="true"
-            android:layout_centerVertical="true" />
+            android:layout_centerVertical="true"
+            android:timePickerMode="spinner" />
 
         <TextView
             android:layout_width="match_parent"

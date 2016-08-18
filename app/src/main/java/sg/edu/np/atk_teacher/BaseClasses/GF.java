@@ -55,17 +55,7 @@ public class GF {
 
         StringClient client = ServiceGenerator.createService(StringClient.class);
         Call<ResponseBody> call = client.logout();
-        call.enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-
-            }
-
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-
-            }
-        });
+        //need not call to server
 
         Intent intent = new Intent(activity, LoginActivity.class);
         activity.startActivity(intent);

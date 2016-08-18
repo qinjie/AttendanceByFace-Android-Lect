@@ -58,6 +58,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         email = _emailTextView.getText().toString();
 
         if (!validate()) {
+            onResetFailed(ErrorClass.invalidEmail_err);
             return;
         }
 

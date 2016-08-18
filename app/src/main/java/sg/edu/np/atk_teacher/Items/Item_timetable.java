@@ -20,7 +20,7 @@ public class Item_timetable {
     private int end_hour;
     private int end_minute;
     private int year;
-    private String month;
+    private int month;
     private int day;
     private int n_students_taken;
     private int n_students;
@@ -102,10 +102,10 @@ public class Item_timetable {
             cal.setTime(date);
 
             year = cal.get(Calendar.YEAR);
-            month = GV.MONTH_NAME[cal.get(Calendar.MONTH)];
+            month = cal.get(Calendar.MONTH) + 1;
             day = cal.get(Calendar.DAY_OF_MONTH);
 
-            this.date = year + "-" + month + "-" + String.format("%02d", day);
+            this.date = year + "-" + String.format("%02d",month) + "-" + String.format("%02d", day);
         }
         catch (Exception e) {
             e.printStackTrace();

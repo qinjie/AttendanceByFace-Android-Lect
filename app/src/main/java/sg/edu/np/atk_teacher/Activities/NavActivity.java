@@ -55,6 +55,8 @@ public class NavActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        setLecturerName();
     }
 
     @Override
@@ -113,11 +115,13 @@ public class NavActivity extends AppCompatActivity
     void setLecturerName() {
         if(getIntent().hasExtra("lecturerName")) {
             String lecturerName = getIntent().getStringExtra("lecturerName");
-            NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-            View hView =  navigationView.getHeaderView(0);
-            TextView nav_user = (TextView)hView.findViewById(R.id.teacher_name);
-            nav_user.setText(lecturerName);
+            GV.lecturerName = lecturerName;
         }
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        View hView =  navigationView.getHeaderView(0);
+        TextView nav_user = (TextView)hView.findViewById(R.id.teacher_name);
+        nav_user.setText(GV.lecturerName);
+
     }
 
 }

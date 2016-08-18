@@ -19,7 +19,8 @@ public class ErrorClass {
                       newPassInvalid_err = 5,
                       incorrectPass_err = 6,
                       unsuccessAttemp_err = 7,
-                      noEmail_err = 8;
+                      noEmail_err = 8,
+                      invalidEmail_err = 9;
     public static void showError(Activity activity, int code) {
         String errorDescription = "";
         if(code == unauthorized_err)
@@ -40,6 +41,8 @@ public class ErrorClass {
             errorDescription = "Unsuccessful attempt";
         if(code == noEmail_err)
             errorDescription = "No user with this email address";
+        if(code == invalidEmail_err)
+            errorDescription = "Invalid Email";
 
         Toast.makeText(activity, errorDescription, Toast.LENGTH_LONG).show();
 
